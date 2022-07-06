@@ -1,0 +1,9 @@
+services:
+  _defaults:
+    public:       false
+
+  ##### User Command
+  austral.security.user:
+    class:        Austral\SecurityBundle\Command\UserCommand
+    tags:
+      - { name: console.command, command: "austral:security:user" }

@@ -1,0 +1,74 @@
+<header class="header-master">
+  <div class="layout-master-structure flex-align-center">
+    <div class="left">
+      <div class="logo">
+        <img src="{{ site.logo }}" alt="{{ site.name }}" />
+      </div>
+    </div>
+    <div class="right">
+      <div class="container-auto-width grid">
+        <div class="row">
+          <div class="col col--xs-11 flex flex-justify-center">
+            <div class="site-name">{{ site.name }}</div>
+          </div>
+          <div class="col col--xs-1">
+            <div class="profil-content">
+              <div class="user-avatar-profile pop-content" data-pop-position="bottom-right" data-pop-menu=".header-master .pop-menu-header-user">
+                <div class="user-avatar-content">
+                  {% if user.image is defined and user.image and user|file_exist("image") %}
+                    <img src="{{ user|image_url("image", "resize-min", 44, 44, "crop") }}" alt="{{ user.lastName }} {{ user.firstName }}" />
+                  {% else %}
+                    <span class="text">{{ user.lastName|slice(0, 1)|upper }}{{ user.firstName|slice(0, 1)|upper }}</span>
+                  {% endif %}
+                </div>
+                <div class="pop-menu-element pop-menu-header-user">
+                  <div class="background">
+                    <div class="clearfix">
+                      <ul>
+                        <li>
+                          <a class="link " href="#">
+                            <i class="picto picto-before size-18 austral-picto-user"></i>
+                            <span class="texte">{{ "user.pop.profil"|trans({}, "header") }}</span>
+                          </a>
+                        </li>
+                        {% if is_granted("ROLE_ROOT") %}
+                          {% set dataReload = [
+                            '#master-content',
+                            '.nav-master',
+                            ".header-master"
+                          ] %}
+                          <li>
+                            <a class="link" href="{{ path('admin_homepage') }}" data-click-actions="reload" data-reload-element="{{ dataReload|json_encode }}" >
+                              <i class="picto picto-before size-18 austral-picto-cog"></i>
+                              <span class="texte">{{ "user.pop.admin"|trans({}, "header") }}</span>
+                            </a>
+                          </li>
+                        {% endif %}
+                        <li>
+                          <a class="link " href="{{ path("logout") }}">
+                            <i class="picto picto-before size-18 austral-picto-power"></i>
+                            <span class="texte">{{ "user.pop.logout"|trans({}, "header") }}</span>
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="flash-messages-content">
+  {% if flashMessages is defined %}
+    {% for key, messages in flashMessages %}
+      {% for message in messages %}
+        <div class="object-{{ key }}" data-message-text="{{ message }}" data-message-position="top" data-message-status="success"></div>
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+</div>

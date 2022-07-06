@@ -1,0 +1,66 @@
+pages:
+  names:
+    security:
+      singular:                                 Security
+      plural:                                   Security
+    securityAdminUsers:
+      singular:                                 Administrator
+      plural:                                   Administrators
+    securityUsers:
+      singular:                                 User
+      plural:                                   Users
+    securityRoles:
+      singular:                                 Role
+      plural:                                   Roles
+    securityGroups:
+      singular:                                 Group
+      plural:                                   Groups
+
+choices:
+  user:
+    type:
+      root:                                     Root
+      admin:                                    Admin
+      user:                                     User
+
+actions:
+  authenticated:                                Authenticated
+
+
+fieldset:
+  connexionInformation:                         Connexion information
+  permissions:                                  Roles
+
+errors:
+  plainPassword:
+    repeat:                                     Password is not identical
+    regex:                                      The password must be at least 8 characters long, contain 1 uppercase, 1 lowercase and 1 number.
+
+authentication:
+  login:                                        Email // Username
+  password:                                     Password
+
+fields:
+  avatarColor:
+    entitled:                                 Color
+  avatar:
+    entitled:                                 Avatar
+  firstname:
+    entitled:                                 Firstname
+  lastname:
+    entitled:                                 Lastname
+  role:
+    entitled:                                 Role name
+  roles:
+    entitled:                                 Roles
+  typeUser:
+    entitled:                                 Type user
+  groups:
+    entitled:                                 Groups
+  securityRoles:
+    entitled:                                 Roles
+  plainPassword:
+    entitled:
+      master:
+        first:                                Password
+        second:                               Password verification

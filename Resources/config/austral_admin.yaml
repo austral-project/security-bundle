@@ -1,0 +1,86 @@
+services:
+  _defaults:
+    autowire:      true
+    autoconfigure: true
+    public:        true
+
+  austral.security.dashboard.listener:
+    class: Austral\SecurityBundle\Listener\DashboardListener
+    arguments: [ "@service_container", "@request_stack" ]
+    tags:
+      - { name: kernel.event_listener, event: "austral.event.admin.dashboard", method: dashboard }
+
+parameters:
+
+  austral.admin.class.user.class:                                   Austral\SecurityBundle\Admin\UserAdmin
+  austral.admin.class.admin_user.class:                             Austral\SecurityBundle\Admin\AdminUserAdmin
+  austral.admin.class.role.class:                                   Austral\SecurityBundle\Admin\RoleAdmin
+  austral.admin.class.group.class:                                  Austral\SecurityBundle\Admin\GroupAdmin
+
+  austral.admin.modules.security_bundle.security.enabled:             true
+  austral.admin.modules.security_bundle.security.user.enabled:        true
+  austral.admin.modules.security_bundle.security.admin_user.enabled:  true
+  austral.admin.modules.security_bundle.security.role.enabled:        true
+  austral.admin.modules.security_bundle.security.group.enabled:       true
+
+  austral_admin.modules.security_bundle:
+    security:
+      enabled:                    "%austral.admin.modules.security_bundle.security.enabled%"
+      navigation:
+        position:                 1000
+      name:                       "Security"
+      picto:                      "austral-picto-lock"
+      route:                      "security"
+      translate:                  "female_c"
+      actions:
+        index:                    "listChildrenModules"
+      children:
+        admin-user:
+          enabled:                "%austral.admin.modules.security_bundle.security.admin_user.enabled%"
+          entity_manager:         "austral.entity_manager.user"
+          name:                   "Users - Admin"
+          picto:                  "austral-picto-user"
+          pictoTile:              "user"
+          route:                  "admin-users"
+          class:                  "%austral.admin.class.admin_user.class%"
+          translate:              "male_v"
+          downloadFormats:
+            - csv
+            - xlsx
+            - json
+        user:
+          enabled:                "%austral.admin.modules.security_bundle.security.user.enabled%"
+          name:                   "Users"
+          picto:                  "austral-picto-user"
+          pictoTile:              "user"
+          route:                  "users"
+          class:                  "%austral.admin.class.user.class%"
+          translate:              "male_v"
+          downloadFormats:
+            - csv
+            - xlsx
+            - json
+        role:
+          enabled:                "%austral.admin.modules.security_bundle.security.role.enabled%"
+          name:                   "Roles"
+          picto:                  "austral-picto-user"
+          pictoTile:              "lock"
+          route:                  "roles"
+          class:                  "%austral.admin.class.role.class%"
+          translate:              "male_c"
+          downloadFormats:
+            - csv
+            - xlsx
+            - json
+        group:
+          enabled:                "%austral.admin.modules.security_bundle.security.group.enabled%"
+          name:                   "Groups"
+          picto:                  "austral-picto-user"
+          pictoTile:              "lock"
+          route:                  "groups"
+          class:                  "%austral.admin.class.group.class%"
+          translate:              "male_c"
+          downloadFormats:
+            - csv
+            - xlsx
+            - json

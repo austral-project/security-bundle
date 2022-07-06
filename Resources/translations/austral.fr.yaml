@@ -1,0 +1,65 @@
+pages:
+  names:
+    security:
+      singular:                                 Sécurité
+      plural:                                   Sécurité
+    securityAdminUsers:
+      singular:                                 Administrateur
+      plural:                                   Administrateurs
+    securityUsers:
+      singular:                                 Utilisateur
+      plural:                                   Utilisateurs
+    securityRoles:
+      singular:                                 Permission
+      plural:                                   Permissions
+    securityGroups:
+      singular:                                 Groupe
+      plural:                                   Groupes
+
+choices:
+  user:
+    type:
+      root:                                     Super Admin
+      admin:                                    Admin
+      user:                                     Utilisateur
+
+actions:
+  authenticated:                                Se connecter
+
+fieldset:
+  connexionInformation:                         Information de connexion
+  permissions:                                  Permissions
+
+errors:
+  plainPassword:
+    repeat:                                     Le password n'est pas identique
+    regex:                                      Le mot de passe doit comporter au moins 8 caractères, contenir 1 majuscule, 1 minuscule et 1 chiffre.
+
+authentication:
+  login:                                        Email // Nom d'utilisateur
+  password:                                     Mot de passe
+
+fields:
+  avatarColor:
+    entitled:                                   Couleur
+  avatar:
+    entitled:                                   Avatar
+  firstname:
+    entitled:                                   Prénom
+  lastname:
+    entitled:                                   Nom
+  role:
+    entitled:                                   Nom de la permission
+  roles:
+    entitled:                                   Permissions
+  typeUser:
+    entitled:                                   Type d'utilisateur
+  groups:
+    entitled:                                   Groupes
+  securityRoles:
+    entitled:                                   Permissions
+  plainPassword:
+    entitled:
+      master:                                   Mot de passe
+      first:                                    Mot de passe
+      second:                                   Vérification du mot de passe

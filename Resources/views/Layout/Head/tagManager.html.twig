@@ -1,0 +1,30 @@
+{% if config.gtm.active is defined and config.gtm.active == "1" and config.gtm.code is defined and config.gtm.code %}
+  {% if noScript is defined and noScript == 1 %}
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe id="tag-manager-iframe" src="https://www.googletagmanager.com/ns.html?id={{ config.gtm.code }}"height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+  {% else %}
+    <!-- Google Tag Manager -->
+<script  id="tag-manager-script">
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','{{ config.gtm.code }}');
+  function checkGa() {
+    if (typeof ga === 'function') {
+      if (typeof ga.getAll != "undefined") {
+        GaTrackingId = ga.getAll()[0].get('trackingId');
+      }
+      else {
+        GaTrackingId = ga.q[0][1];
+      }
+    } else {
+      setTimeout(checkGa, 500);
+    }
+  }
+  checkGa();
+</script>
+    <!-- End Google Tag Manager -->
+  {% endif %}
+{% endif %}

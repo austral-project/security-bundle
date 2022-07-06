@@ -1,0 +1,46 @@
+{% set pictoClass = false %}
+{% if picto is defined %}
+  {% if picto is iterable %}
+    {% if picto.class is defined and picto.class %}
+      {% set pictoClass = picto.class %}
+    {% endif %}
+  {% else %}
+    {% set pictoClass = picto %}
+  {% endif %}
+{% endif %}
+
+{% set tagSelect = tag ?? "a" %}
+
+
+<{{ tagSelect }} {% if tagSelect == "a" %}href="{{ url }}"{% endif %}
+  class="button {{ class is defined ? class : "" }} {% if pictoClass %}with-picto{% endif %}"
+  {% if attr is defined and attr %}
+    {{ attr is defined ? attr|raw() : "" }}
+  {% else %}
+    {% if actions is defined and actions|length > 0 %}
+      data-click-actions="{{ actions|join(',') }}"
+    {% endif %}
+    {% if callbackElement is defined and callbackElement %}
+      data-reload-element="{{ callbackElement }}"
+    {% endif %}
+
+    {% if confirm is defined and confirm|length > 0 %}
+      {% set name = confirm.objectKey is defined ? object|tools_valueByKey(confirm.objectKey, "") : "" %}
+      data-alert="confirm"
+      data-alert-message="{{ confirm.message is defined ? confirm.message|trans({"%name%": name}, "austral") : "" }}"
+      data-alert-title="{{ confirm.title is defined ? confirm.title|trans({"%name%": name}, "austral") : "" }}"
+    {% endif %}
+  {% endif%}
+  title="{{ title }}"
+>
+
+  {% if pictoClass and picto.position is defined and picto.position == "before" %}
+    <span class="picto picto-before {{ pictoClass }}"></span>
+  {% endif %}
+  <span class="content">
+    {{ html is defined ? html|raw() : title }}
+  </span>
+  {% if pictoClass and (picto.position is not defined or picto.position == "after") %}
+    <span class="picto picto-after {{ pictoClass}}"></span>
+  {% endif %}
+</{{ tagSelect }}>

@@ -1,0 +1,42 @@
+{
+  "name":                                     "austral/security-bundle",
+  "type":                                     "symfony-bundle",
+  "description":                              "Austral users, roles and user groups",
+  "keywords":                                 ["Austral", "User", "Security"],
+  "license":                                  "MIT",
+  "homepage":                                 "https://austral.dev",
+  "version":                                  "3.0",
+  "authors": [
+    {
+      "name":                                 "Matthieu Beurel",
+      "email":                                "matthieu@austral.dev",
+      "role":                                 "Developer"
+    }
+  ],
+  "require": {
+    "php":                                    "^7.4 || ^8.0",
+
+    "austral/tools-bundle":                   "^3.0",
+    "austral/entity-file-bundle":             "^3.0",
+    "austral/entity-bundle":                  "^3.0",
+
+    "doctrine/annotations":                   "^1.0",
+    "doctrine/doctrine-bundle":               "^2.2",
+    "doctrine/doctrine-migrations-bundle":    "^3.0",
+    "doctrine/orm":                           "^2.7",
+
+    "symfony/console":                        "^5.4",
+    "symfony/security-bundle":                "^5.4",
+    "symfony/framework-bundle":               "^5.4",
+    "symfony/yaml":                           "^5.4"
+  },
+  "require-dev": {
+  },
+  "config": {
+    "sort-packages":                          true
+  },
+  "autoload": {
+    "psr-4": { "Austral\\SecurityBundle\\": "" }
+  },
+  "minimum-stability":                        "dev"
+}

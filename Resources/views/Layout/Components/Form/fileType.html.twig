@@ -1,0 +1,106 @@
+<div id="{{ form.view.vars.name }}-{{ field.name }}-uploads-content" class="file-uploads-content"
+     data-file-input="js"
+     data-file-max-size="{{ field.parameters.file.maxSizeReel }}"
+     data-file-mime-types="{{ field.parameters.file.mimeTypes|json_encode }}"
+>
+  {{ field.input|raw() }}
+  <input id="{{ form.view.vars.name }}_delete_{{ field.name }}" name="{{ form.view.vars.name }}_delete[{{ field.name }}]" class="input-hidden-file" value="0" type="hidden" />
+
+  {% if field.parameters.cropper is defined %}
+    <input id="{{ form.view.vars.name }}_crop_{{ field.name }}" name="{{ form.view.vars.name }}_crop[{{ field.name }}]" class="input-hidden-crop" value="" data-cropper-values="{{ (object|tools_valueByKey(field.name ~ "Crop", []))|json_encode }}" type="hidden" />
+  {% endif %}
+  <div class="file-uploads-preview-default {% if object|file_exist(field.name) %}has-file{% endif %}" data-hover-class="hover-actions">
+    <div class="file-uploads-preview">
+      <div class="new-current-content">
+        <div class="new"></div>
+        {% if object|file_exist(field.name) %}
+          <div class="current">
+            <img src="{{ object|image_url(field.name, "i", 200, 200, (field.parameters.cropper ? "crop" : null)) }}" alt="">
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="file-uploads-default" data-click-actions="add-file">
+      <div class="default">
+        <img src="{{ asset('img/picto/image.svg') }}" alt="{{ ("form.file.add")|trans({}, "form")}}" />
+        <span class="add">{{ "file.actions.add"|trans({}, "form")}}</span>
+        <span class="info size">{{ "file.info.uploads.size"|trans({"%size%": field.parameters.file.maxSize}, "form")}}</span>
+        <span class="info mime-types">{{ "file.info.uploads.mimeType"|trans({"%mimeType%": field.parameters.file.extensions|join(", ")}, "form")|raw }}</span>
+      </div>
+    </div>
+    <div class="file-uploads-actions">
+      <ul class="actions">
+        {% if field.parameters.cropper is defined %}
+          <li class="action action-new" data-click-actions="crop-file" data-cropper="#{{ form.view.vars.name }}-{{ field.name }}-uploads-content" data-cropper-options="{{ field.parameters.cropper|json_encode }}" data-cropper-image-url="{{ object|image_url(field.name, "i") }} }}">
+            <i class="picto austral-picto-crop"></i>
+            <span class="texte">{{ "file.actions.crop"|trans({}, "form")}}</span>
+          </li>
+        {% endif %}
+        <li class="action action-delete">
+          <i class="picto  austral-picto-trash"></i>
+          <span class="texte">{{ "file.actions.delete"|trans({}, "form")}}</span>
+        </li>
+        <li class="action action-cancel">
+          <i class="austral-picto-cross"></i>
+          <span class="texte">{{ "file.actions.cancel"|trans({}, "form")}}</span>
+        </li>
+        <li class="action action-new" data-click-actions="add-file">
+          <i class="picto austral-picto-cloud-upload"></i>
+          <span class="texte">{{ "file.actions.replace"|trans({}, "form")}}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="file-uploads-infos-content {% if object|file_exist(field.name) %}view{% endif %}"
+       data-file-name="{{ object.getReelFileName(field.name)  }}"
+       data-file-size="{{ object|file_size(field.name, 1)  }}"
+       data-file-mimeType="{{ object|file_mimeType(field.name)  }}"
+       data-file-imageSize="{{ object|image_size(field.name, 0)  }}"
+  >
+    <div class="content-infos">
+      <span class="title">{{ "file.info.title"|trans({}, "form") }}</span>
+      <ul class="file-infos">
+        <li class="file-filename">
+          <div class="content-value">
+            <span class="intitule">{{ "file.info.filename"|trans({}, "form") }}</span>
+            <span class="value" {% if field.parameters.cropper is defined %}data-cropper-infos="filename"{% endif %}>{{ object.getReelFileName(field.name) }}</span>
+          </div>
+        </li>
+        <li class="file-size">
+          <div class="content-value">
+            <span class="intitule">{{ "file.info.size"|trans({}, "form") }}</span>
+            <span class="value" {% if field.parameters.cropper is defined %}data-cropper-infos="size"{% endif %}>{{ object|file_size(field.name, 1) }}</span>
+          </div>
+          <div class="errors"></div>
+        </li>
+        <li class="file-mimeType">
+          <div class="content-value">
+            <span class="intitule">{{ "file.info.mimeType"|trans({}, "form") }}</span>
+            <span class="value" {% if field.parameters.cropper is defined %}data-cropper-infos="mime-type"{% endif %}>{{ object|file_mimeType(field.name) }}</span>
+          </div>
+          <div class="errors"></div>
+        </li>
+
+        <li class="file-imageSize {% if object|is_image(field.name) %}view{% endif %}">
+          <div class="content-value">
+            <span class="intitule">{{ "file.info.imageSize"|trans({}, "form") }}</span>
+            <span class="value" {% if field.parameters.cropper is defined %}data-cropper-infos="image-size"{% endif %}>{{ object|image_size(field.name, 0) }}</span>
+          </div>
+        </li>
+        {% if object|file_exist(field.name) %}
+          <li class="button-content view">
+            {{ include('Layout/Components/button.html.twig', {
+              url:              object|download_url(field.name),
+              title:            "file.info.download"|trans({}, "form"),
+              class:            "blue",
+              picto:            {
+                position:         "before",
+                class:            "austral-picto-cloud-download"
+              }
+            }) }}
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</div>

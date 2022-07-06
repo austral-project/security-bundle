@@ -1,0 +1,10 @@
+####> Project ###
+/.settings/
+/.project
+/.idea
+*~
+####< Project ###
+
+###> Mac ###
+.DS_Store
+###< Mac ###

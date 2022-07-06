@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!--[if IE 6]>
+<html id="ie6" dir="ltr" lang="fr-FR">
+<![endif]-->
+<!--[if IE 7]>
+<html id="ie7" dir="ltr" lang="fr-FR">
+<![endif]-->
+<!--[if IE 8]>
+<html id="ie8" dir="ltr" lang="fr-FR">
+<![endif]-->
+<!--[if IE 9]>
+<html id="ie9" lang="fr">
+<![endif]-->
+<!--[if (gt IE 10)|!(IE)]><!--><html lang="fr"><!--<![endif]-->
+{% apply spaceless %}
+  <head>
+    <meta charset="UTF-8">
+    {% if rgpd is defined %}
+      <script type="text/javascript">
+        var GaTrackingId = "";
+        const australRgpdCookieName = "{{ rgpd.cookieName }}";
+        const australConfig = {
+          rgpd: {{(rgpd.cookies|json_encode|raw)}},
+          domain: "{{ rgpd.cookieDomain }}"
+        };
+      </script>
+    {% endif %}
+
+    {% block head_meta %}
+      {{ include('@AustralSecurity/Layout/Head/meta.html.twig') }}
+    {% endblock %}
+
+    {% block head_metaRef %}
+      {{ include('@AustralSecurity/Layout/Head/metaRef.html.twig') }}
+    {% endblock %}
+
+    {% block stylesheets %}
+      {{ encore_entry_link_tags('app') }}
+    {% endblock %}
+  </head>
+{% endapply %}
+{% apply spaceless %}
+  <body class="authenticated">
+    <header class="header-master"></header>
+    <div id="flash-messages-content"></div>
+    <div id="master-conteneur">
+      <div class="layout-master-structure height-full">
+        <div class="right">
+          <div id="master-content">
+            {% block body %}{% endblock %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="{{ path('front_translation', {locale: app.request.locale}) }}"></script>
+    {% block javascripts %}
+      {{ encore_entry_script_tags('app') }}
+    {% endblock %}
+  </body>
+{% endapply %}
+</html>

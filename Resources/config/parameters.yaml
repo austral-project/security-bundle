@@ -1,0 +1,12 @@
+parameters:
+
+##### Entities Class
+  austral.entity.user.class:                                        App\Entity\Austral\SecurityBundle\User
+  austral.entity.role.class:                                        App\Entity\Austral\SecurityBundle\Role
+  austral.entity.group.class:                                       App\Entity\Austral\SecurityBundle\Group
+
+##### Doctrine Resolve target Entities
+  austral.resolve_target_entities.security:
+    Austral\SecurityBundle\Entity\Interfaces\UserInterface:         "%austral.entity.user.class%"
+    Austral\SecurityBundle\Entity\Interfaces\RoleInterface:         "%austral.entity.role.class%"
+    Austral\SecurityBundle\Entity\Interfaces\GroupInterface:        "%austral.entity.group.class%"

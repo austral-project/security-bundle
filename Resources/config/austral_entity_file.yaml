@@ -1,0 +1,19 @@
+parameters:
+
+  austral_entity_file.cropper.security_bundle:
+    avatar:
+      name:  Avatar
+      ratio: 1 / 1
+      picto: "austral-picto-user"
+
+  austral_entity_file.uploads.security_bundle:
+    avatar:
+      size:
+        max: "10M"
+      mimeTypes:
+        - 'image/jpg'
+        - 'image/jpeg'
+        - 'image/png'
+        - 'image/gif'
+        - 'image/svg'
+        - 'image/svg+xml'

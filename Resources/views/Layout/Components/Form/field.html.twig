@@ -1,0 +1,18 @@
+<div class="element-form {{ field.name }} {{ field.parameters.fieldType is defined ? "field-"~field.parameters.fieldType : "" }}">
+  <div class="field-content {% if field.animeLabel != 0 %}animate-label{% endif %} {% if field.parameters.required is defined and field.parameters.required %}is-required{% endif %} is-field-{{ field.name }} {% if field.errors %}is-error{% endif %} {% if field.parameters.class is defined and field.parameters.class %}{{ field.parameters.class }}{% endif %}">
+    {% if field.label is defined and field.label and field.animeLabel != 0 %}
+      {{ field.label|raw() }}
+    {% endif %}
+    <div class="field radius{{ (field.parameters.attr.class is defined)? " "~field.parameters.attr.class : "" }}">
+      {% if field.parameters.attr.picto is defined and field.parameters.attr.picto %}
+        <span class="picto-left {{ field.parameters.attr.picto }}"></span>
+      {% endif %}
+      {{ field.input|raw() }}
+    </div>
+  </div>
+  {% if field.errors %}
+    <div class="error-content">
+      {{ field.errors|raw() }}
+    </div>
+  {% endif %}
+</div>

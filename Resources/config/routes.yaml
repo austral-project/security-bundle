@@ -1,0 +1,8 @@
+##### Authenticated
+security_login:
+  path: /login
+  controller: Austral\SecurityBundle\Controller\AuthenticatedController::login
+
+security_logout:
+  path: /logout
+  controller: Austral\SecurityBundle\Controller\AuthenticatedController::logout

@@ -1,0 +1,44 @@
+services:
+  _defaults:
+    autowire:      false
+    autoconfigure: false
+    public:        true
+
+##### Listener Entity Manager
+  austral.security.entity.manager.listener:
+    class:        Austral\SecurityBundle\Listener\EntityManagerListener
+    arguments:    ["@event_dispatcher"]
+    tags:
+      - { name: kernel.event_listener, event: "austral.entity_manager.update", method: update }
+
+##### Security Checker
+  austral.security.user_provider:
+    class:        Austral\SecurityBundle\Security\UserProvider
+    arguments:    [ "@austral.entity_manager.user" ]
+
+##### Security Authenticator
+  austral.security.authenticator:
+    class:        Austral\SecurityBundle\Security\Authenticator\UserAuthenticator
+    arguments:    [ "@austral.entity_manager.user", "@router", "@security.csrf.token_manager", "@security.password_encoder", "@session" ]
+
+##### Security Checker
+  security.authorization_checker:
+    class:        Austral\SecurityBundle\Security\Authorization\AuthorizationChecker
+    arguments:    [ "@security.token_storage", "@security.authentication.manager",  "@security.access.decision_manager", "%security.access.always_authenticate_before_granting%" ]
+
+##### User Entity Manager
+  austral.entity_manager.user:
+    class:        Austral\SecurityBundle\EntityManager\UserEntityManager
+    arguments:    ["@doctrine.orm.entity_manager",  "@event_dispatcher", "%austral.entity.user.class%"]
+    calls:
+      - setPasswordHasherFactory: [ '@security.password_hasher_factory' ]
+
+##### Role Entity Manager
+  austral.entity_manager.role:
+    class:        Austral\SecurityBundle\EntityManager\RoleEntityManager
+    arguments:    [ "@doctrine.orm.entity_manager",  "@event_dispatcher", "%austral.entity.role.class%"]
+
+##### Group Entity Manager
+  austral.entity_manager.group:
+    class:        Austral\SecurityBundle\EntityManager\GroupEntityManager
+    arguments:    [ "@doctrine.orm.entity_manager",  "@event_dispatcher", "%austral.entity.group.class%"]
