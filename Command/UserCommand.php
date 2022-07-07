@@ -56,6 +56,7 @@ class UserCommand extends Command
         new InputOption('--root', '', InputOption::VALUE_NONE, 'Setted Super Admin to user role '),
         new InputOption('--create', '-c', InputOption::VALUE_NONE, 'Used to your create a new user'),
         new InputOption('--disabled', '-d', InputOption::VALUE_NONE, 'Disabled user'),
+        new InputOption('--if-not-exist', '', InputOption::VALUE_NONE, 'Disabled user'),
       ])
       ->setDescription('Create new User or update password user')
       ->setHelp(<<<'EOF'
@@ -79,7 +80,6 @@ EOF
    * @throws CommandException
    * @throws NonUniqueResultException
    * @throws ORMException
-   * @throws OptimisticLockException
    */
   protected function executeCommand(InputInterface $input, OutputInterface $output)
   {
@@ -101,7 +101,15 @@ EOF
     $user = $userManager->retreiveByEmail($email);
     if($createUser && $user)
     {
-      throw new CommandException("you don't create user with username {$email} by this user already exist !");
+      if(!$input->getOption("if-not-exist"))
+      {
+        throw new CommandException("you don't create user with username {$email} by this user already exist !");
+      }
+      else
+      {
+        $this->viewMessage("User {$email} is already exist !!!", "success");
+        return ;
+      }
     }
     elseif($user)
     {
