@@ -55,6 +55,11 @@ class RoleAdmin extends Admin implements AdminModuleInterface
   {
     $listAdminEvent->getListMapper()
       ->getSection("default")
+        ->buildDataHydrate(function(DataHydrateORM $dataHydrate) {
+          $dataHydrate->addQueryBuilderPaginatorClosure(function(QueryBuilder $queryBuilder) {
+            return $queryBuilder->orderBy("root.name", "ASC");
+          });
+        })
         ->addColumn(new Column\Value("name", "fields.name.entitled"))
         ->addColumn(new Column\Value("role", "fields.role.entitled"))
         ->addColumn(new Column\Date("updated", "fields.updated.entitled", "d/m/Y"))
