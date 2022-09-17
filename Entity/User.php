@@ -10,7 +10,7 @@
 
 namespace Austral\SecurityBundle\Entity;
 
-use Austral\EntityFileBundle\Entity\Interfaces\EntityFileInterface;
+use Austral\EntityBundle\Entity\Interfaces\FileInterface;
 use Austral\EntityFileBundle\Entity\Traits\EntityFileCropperTrait;
 use Austral\EntityFileBundle\Entity\Traits\EntityFileTrait;
 use Austral\SecurityBundle\Entity\Interfaces\GroupInterface;
@@ -33,7 +33,7 @@ use Ramsey\Uuid\Uuid;
  * @abstract
  * @ORM\MappedSuperclass
  */
-abstract class User extends Entity implements UserInterface, EntityInterface, EntityFileInterface
+abstract class User extends Entity implements UserInterface, EntityInterface, FileInterface
 {
 
   const USER_TYPE_ROOT = "root";

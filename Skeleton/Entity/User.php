@@ -10,7 +10,7 @@
 
 namespace App\Entity\Austral\SecurityBundle;
 
-use Austral\EntityFileBundle\Entity\Interfaces\EntityFileInterface;
+use Austral\EntityBundle\Entity\Interfaces\FileInterface;
 use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
 use Austral\SecurityBundle\Entity\User as BaseUser;
 
@@ -27,7 +27,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  * @ORM\Table(name="austral_security_user")
  * @ORM\Entity(repositoryClass="Austral\SecurityBundle\Repository\UserRepository")
  */
-class User extends BaseUser implements UserInterface, EntityInterface, EntityFileInterface
+class User extends BaseUser implements UserInterface, EntityInterface, FileInterface
 {
   /**
    * User constructor.

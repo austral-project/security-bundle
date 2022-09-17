@@ -1,6 +1,9 @@
 Changelog
 =========
 
+### Version 3.1.0 (2022-09-17)
+* Updated bundles version to 3.1 for use the new Entities Interfaces
+
 ### Version 3.0.0 (2021-02-10)
 * Created new repository and new branch in to Github
 * Changed the project License to the MIT
