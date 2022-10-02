@@ -16,7 +16,7 @@ composer require austral/security-bundle
 ```
 
 ## Documentation
-See documentation on the [official website](https://austral.dev/bundles/security-bundle)
+See documentation on the [official website](https://austral.dev/en/bundles/security-bundle)
 
 ## Commit Messages
 
