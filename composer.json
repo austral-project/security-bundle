@@ -5,7 +5,6 @@
   "keywords":                                 ["Austral", "User", "Security"],
   "license":                                  "MIT",
   "homepage":                                 "https://austral.dev",
-  "version":                                  "3.1",
   "authors": [
     {
       "name":                                 "Matthieu Beurel",
