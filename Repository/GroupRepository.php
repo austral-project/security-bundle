@@ -11,7 +11,7 @@
 namespace Austral\SecurityBundle\Repository;
 
 use Austral\EntityBundle\Repository\EntityRepository;
-use Austral\EntityBundle\Repository\RepositoryInterface;
+use Austral\EntityBundle\Repository\EntityRepositoryInterface;
 use Austral\SecurityBundle\Entity\Interfaces\GroupInterface;
 use Doctrine\ORM\NonUniqueResultException;
 
@@ -20,7 +20,7 @@ use Doctrine\ORM\NonUniqueResultException;
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @final
  */
-class GroupRepository extends EntityRepository implements RepositoryInterface
+class GroupRepository extends EntityRepository implements EntityRepositoryInterface
 {
 
   /**

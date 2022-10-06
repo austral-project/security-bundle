@@ -11,7 +11,7 @@
 namespace Austral\SecurityBundle\Repository;
 
 use Austral\EntityBundle\Repository\EntityRepository;
-use Austral\EntityBundle\Repository\RepositoryInterface;
+use Austral\EntityBundle\Repository\EntityRepositoryInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\QueryException;
 
@@ -20,7 +20,7 @@ use Doctrine\ORM\Query\QueryException;
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @final
  */
-class RoleRepository extends EntityRepository implements RepositoryInterface
+class RoleRepository extends EntityRepository implements EntityRepositoryInterface
 {
 
   /**

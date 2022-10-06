@@ -13,7 +13,7 @@ namespace Austral\SecurityBundle\Repository\Base;
 use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
 
 use Austral\EntityBundle\Repository\EntityRepository;
-use Austral\EntityBundle\Repository\RepositoryInterface;
+use Austral\EntityBundle\Repository\EntityRepositoryInterface;
 
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -24,7 +24,7 @@ use Doctrine\ORM\QueryBuilder;
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @abstract
  */
-class BaseUserRepository extends EntityRepository implements RepositoryInterface
+class BaseUserEntityRepository extends EntityRepository implements EntityRepositoryInterface
 {
 
   /**

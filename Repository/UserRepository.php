@@ -9,7 +9,7 @@
  */
 
 namespace Austral\SecurityBundle\Repository;
-use Austral\SecurityBundle\Repository\Base\BaseUserRepository;
+use Austral\SecurityBundle\Repository\Base\BaseUserEntityRepository;
 
 
 /**
@@ -17,7 +17,7 @@ use Austral\SecurityBundle\Repository\Base\BaseUserRepository;
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @final
  */
-class UserRepository extends BaseUserRepository
+class UserRepository extends BaseUserEntityRepository
 {
 
 }
