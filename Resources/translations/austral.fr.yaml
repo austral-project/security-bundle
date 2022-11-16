@@ -60,6 +60,6 @@ fields:
     entitled:                                   Permissions
   plainPassword:
     entitled:
-      master:                                   Mot de passe
-      first:                                    Mot de passe
-      second:                                   Vérification du mot de passe
+      master:
+        first:                                  Mot de passe
+        second:                                 Vérification du mot de passe
