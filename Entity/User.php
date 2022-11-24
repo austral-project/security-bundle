@@ -22,6 +22,8 @@ use Austral\EntityBundle\Entity\Entity;
 use Austral\EntityBundle\Entity\EntityInterface;
 use Austral\EntityBundle\Entity\Traits as Traits;
 
+
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -33,7 +35,7 @@ use Ramsey\Uuid\Uuid;
  * @abstract
  * @ORM\MappedSuperclass
  */
-abstract class User extends Entity implements UserInterface, EntityInterface, FileInterface
+abstract class User extends Entity implements UserInterface, EntityInterface, FileInterface, PasswordAuthenticatedUserInterface
 {
 
   const USER_TYPE_ROOT = "root";
@@ -358,6 +360,14 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   public function getGroups(): Collection
   {
     return $this->groups;
+  }
+
+  /**
+   * @return string|null
+   */
+  public function getUserIdentifier(): ?string
+  {
+    return $this->username;
   }
 
   /**
