@@ -18,7 +18,7 @@
                   field: {
                     animeLabel:   1,
                     name:         "login",
-                    input:        '<input type="text" value="" name="email" id="login-email" class="form-control" required autofocus>',
+                    input:        '<input type="text" value="" name="_username" id="login-email" class="form-control" required autofocus>',
                     label:        '<label for="login-email">'~("user.fields.email.label"|trans({}, 'form'))~'</label>',
                     errors:       "",
                     parameters:   {
@@ -34,7 +34,7 @@
                   field: {
                     animeLabel:   1,
                     name:         "login",
-                    input:        '<input type="password" name="password" id="login-password" class="form-control" required>',
+                    input:        '<input type="password" name="_password" id="login-password" class="form-control" required>',
                     label:        '<label for="login-password">'~("user.fields.password.first.label"|trans({}, 'form'))~'</label>',
                     errors:       "",
                     parameters:   {

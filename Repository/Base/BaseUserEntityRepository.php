@@ -18,13 +18,15 @@ use Austral\EntityBundle\Repository\EntityRepositoryInterface;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * Austral Base User Repository.
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @abstract
  */
-class BaseUserEntityRepository extends EntityRepository implements EntityRepositoryInterface
+class BaseUserEntityRepository extends EntityRepository implements EntityRepositoryInterface, UserLoaderInterface, PasswordUpgraderInterface
 {
 
   /**
@@ -68,6 +70,29 @@ class BaseUserEntityRepository extends EntityRepository implements EntityReposit
   }
 
   /**
+   * @throws NonUniqueResultException
+   * @deprecated since Symfony 5.3
+   */
+  public function loadUserByUsername(string $usernameOrEmail): ?UserInterface
+  {
+    return $this->loadUserByIdentifier($usernameOrEmail);
+  }
+
+  /**
+   * loadUserByIdentifier
+   *
+   * @param string $usernameOrEmail
+   *
+   * @return UserInterface|null
+   * @throws NonUniqueResultException
+   */
+  public function loadUserByIdentifier(string $usernameOrEmail): ?UserInterface
+  {
+    dump('stop');
+    return $this->retreiveByLogin($usernameOrEmail);
+  }
+
+  /**
    * @param string $login
    *
    * @return UserInterface|null
@@ -89,6 +114,23 @@ class BaseUserEntityRepository extends EntityRepository implements EntityReposit
       $object = null;
     }
     return $object;
+  }
+
+  /**
+   * upgradePassword
+   *
+   * @param UserInterface $user
+   * @param string $newHashedPassword
+   *
+   * @return void
+   */
+  public function upgradePassword(UserInterface $user, string $newHashedPassword): void
+  {
+    // set the new hashed password on the User object
+    $user->setPassword($newHashedPassword);
+
+    // execute the queries on the database
+    $this->getEntityManager()->flush();
   }
 
 }

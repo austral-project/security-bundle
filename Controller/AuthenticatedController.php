@@ -14,6 +14,7 @@ use Austral\HttpBundle\Controller\HttpController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
  * Austral Authenticated Controller.
@@ -30,15 +31,17 @@ class AuthenticatedController extends HttpController
    *
    * @return Response
    */
-  public function login(Request $request)
+  public function login(AuthenticationUtils $authenticationUtils, Request $request)
   {
     if ($this->getUser())
     {
       return new RedirectResponse($this->generateUrl($this->container->getParameter("security_login_redirect"), array()), 302);
     }
+    $error = $authenticationUtils->getLastAuthenticationError();
+    $lastUsername = $authenticationUtils->getLastUsername();
     return $this->render('@AustralSecurity/login.html.twig', array(
-        "last_username" => "",
-        "error"         => ""
+        "last_username" => $lastUsername,
+        "error"         => $error
       )
     );
   }

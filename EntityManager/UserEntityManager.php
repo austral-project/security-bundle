@@ -125,7 +125,7 @@ class UserEntityManager extends EntityManager implements UserEntityManagerInterf
     if (0 !== strlen($password = $user->getPlainPassword()))
     {
       $encoder = $this->getEncoder($user);
-      $user->setPassword($encoder->hash($password.$user->getSalt()));
+      $user->setPassword($encoder->hash($password, $user->getSalt()));
       $user->eraseCredentials();
     }
     return $this;

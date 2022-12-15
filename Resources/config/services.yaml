@@ -1,8 +1,12 @@
 services:
   _defaults:
-    autowire:      false
-    autoconfigure: false
+    autowire:      true
+    autoconfigure: true
     public:        true
+
+  Austral\SecurityBundle\Controller\:
+    resource: '../../Controller/'
+    tags: [ 'controller.service_arguments' ]
 
 ##### Listener Entity Manager
   austral.security.entity.manager.listener:
@@ -11,20 +15,24 @@ services:
     tags:
       - { name: kernel.event_listener, event: "austral.entity_manager.update", method: update }
 
-##### Security Checker
+##### User provider
   austral.security.user_provider:
     class:        Austral\SecurityBundle\Security\UserProvider
     arguments:    [ "@austral.entity_manager.user" ]
 
-##### Security Authenticator
-  austral.security.authenticator:
-    class:        Austral\SecurityBundle\Security\Authenticator\UserAuthenticator
-    arguments:    [ "@austral.entity_manager.user", "@router", "@security.csrf.token_manager", "@security.password_encoder", "@session" ]
+##### Old Password Hasher
+  austral.security.hasher.migrate_password:
+    class:      Austral\SecurityBundle\Security\Hasher\MigratePasswordHasher
 
 ##### Security Checker
   security.authorization_checker:
-    class:        Austral\SecurityBundle\Security\Authorization\AuthorizationChecker
-    arguments:    [ "@security.token_storage", "@security.authentication.manager",  "@security.access.decision_manager", "%security.access.always_authenticate_before_granting%" ]
+    class: Austral\SecurityBundle\Security\Authorization\AuthorizationChecker
+    arguments: [ "@security.token_storage", "@security.access.decision_manager" ]
+
+##### Security Authenticator
+  austral.security.authenticator:
+    class:        Austral\SecurityBundle\Security\Authenticator\FormLoginAuthenticator
+    arguments:    [ "@austral.entity_manager.user", "@austral.security.user_provider","@router", "@security.csrf.token_manager", "@security.user_password_hasher" ]
 
 ##### User Entity Manager
   austral.entity_manager.user:

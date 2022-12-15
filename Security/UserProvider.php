@@ -12,17 +12,17 @@ namespace Austral\SecurityBundle\Security;
 
 use Austral\SecurityBundle\EntityManager\Interfaces\UserEntityManagerInterface;
 
-use Symfony\Component\Security\Core\Exception\UserNotFoundException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 /**
  * User provider.
  * @author Matthieu Beurel <matthieu@austral.dev>
  */
-class UserProvider implements UserProviderInterface
+class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
     
   /**
@@ -48,7 +48,7 @@ class UserProvider implements UserProviderInterface
     $user = $this->findUser($username);
     if (!$user)
     {
-      throw new UserNotFoundException(sprintf('Username "%s" does not exist.', $username));
+      throw new UnsupportedUserException(sprintf('Username "%s" does not exist.', $username));
     }
     return $user;
   }
@@ -61,7 +61,7 @@ class UserProvider implements UserProviderInterface
     $user = $this->findUser($username);
     if (!$user)
     {
-      throw new UsernameNotFoundException(sprintf('Username "%s" does not exist.', $username));
+      throw new UnsupportedUserException(sprintf('Username "%s" does not exist.', $username));
     }
     return $user;
   }
@@ -98,6 +98,20 @@ class UserProvider implements UserProviderInterface
   protected function findUser(string $username): ?UserInterface
   {
     return $this->userManager->retreiveByLogin($username);
+  }
+
+  /**
+   * upgradePassword
+   *
+   * @param PasswordAuthenticatedUserInterface $user
+   * @param string $newHashedPassword
+   *
+   * @return void
+   */
+  public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
+  {
+    $user->setPassword($newHashedPassword);
+    $this->userManager->update($user);
   }
 
 }

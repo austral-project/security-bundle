@@ -10,7 +10,6 @@
 
 namespace Austral\SecurityBundle\DependencyInjection\Compiler;
 
-use Doctrine\ORM\Version;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

@@ -14,6 +14,7 @@
   ],
   "require": {
     "php":                                    "^7.4 || ^8.0",
+    "ext-sodium":                             "*",
 
     "austral/tools-bundle":                   "^3.1",
     "austral/entity-file-bundle":             "^3.1",
