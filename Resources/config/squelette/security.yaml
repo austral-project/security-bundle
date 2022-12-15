@@ -1,0 +1,72 @@
+security:
+  enable_authenticator_manager: true
+
+  role_hierarchy:
+    ROLE_ROOT:                  [ ROLE_ADMIN_ACCESS, ROLE_USER_ACCESS ]
+
+  password_hashers:
+    migrate_austral_hasher:
+      id:                       austral.security.hasher.migrate_password
+
+    App\Entity\Austral\SecurityBundle\User:
+      algorithm:                sodium
+      migrate_from:
+        - migrate_austral_hasher
+
+  # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+  providers:
+    austral_security_user:
+      id:                       austral.security.user_provider
+
+  firewalls:
+    dev:
+      pattern:                  ^/(_(profiler|wdt)|css|images|js)/
+      security:                 false
+
+    austral_admin:
+      pattern:                  "^/%austral.admin.path%"
+      security:                 true
+      lazy:                     true
+      provider:                 austral_security_user
+      logout:
+        path:                   austral_admin_security_logout
+        target:                 austral_admin_security_login
+      form_login:
+        use_referer:            true
+        login_path:             austral_admin_security_login
+        check_path:             austral_admin_security_login
+        default_target_path:    austral_admin_index
+      remember_me:
+        secret:                 '%kernel.secret%'
+        lifetime:               604800 # 1 week in seconds
+        always_remember_me:     true
+
+
+    main:
+      security:                 false
+      lazy:                     true
+      provider:                 austral_security_user
+      logout:
+        path:                   security_logout
+        target:                 security_login
+      form_login:
+        use_referer:            true
+        login_path:             austral_admin_security_login
+        check_path:             austral_admin_security_login
+      remember_me:
+        secret:                 '%kernel.secret%'
+        lifetime:               604800 # 1 week in seconds
+        always_remember_me:     true
+
+  # Easy way to control access for large sections of your site
+  # Note: Only the *first* access control that matches will be used
+  access_control:
+    - { path: "^/%austral.admin.path%/login", roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: "^/%austral.admin.path%/logout", roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: "^/%austral.admin.path%/translation-([a-z]{2}).js$", roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: "^/%austral.admin.path%", roles: ROLE_ADMIN_ACCESS }
+    - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY}
+    - { path: '^/translation-([a-z]{2}).js$', roles: IS_AUTHENTICATED_ANONYMOUSLY}
+    - { path: ^/_wdt, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+    - { path: ^/_profiler, roles: IS_AUTHENTICATED_ANONYMOUSLY}
+    - { path: ^/, roles: IS_AUTHENTICATED_ANONYMOUSLY}

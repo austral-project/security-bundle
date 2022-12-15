@@ -46,32 +46,23 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
   /**
    * @var bool
    */
-  private bool $alwaysAuthenticate;
-
-  /**
-   * @var bool
-   */
   private bool $exceptionOnNoToken;
 
-
   /**
+   * AuthorizationChecker constructor
+   *
    * @param TokenStorageInterface $tokenStorage
-   * @param AuthenticationManagerInterface $authenticationManager
-   * @param AccessDecisionManagerInterface $accessDecisionManager
-   * @param bool $alwaysAuthenticate
-   * @param bool $exceptionOnNoToken
+   * @param $accessDecisionManager
+   * @param $alwaysAuthenticate
+   * @param $exceptionOnNoToken
    */
-  public function __construct(TokenStorageInterface $tokenStorage,
-    AuthenticationManagerInterface $authenticationManager,
-    AccessDecisionManagerInterface $accessDecisionManager,
-    bool $alwaysAuthenticate = false,
-    bool $exceptionOnNoToken = true
-  )
+  public function __construct(TokenStorageInterface $tokenStorage, /* AccessDecisionManagerInterface */ $accessDecisionManager, /* bool */ $alwaysAuthenticate = false, /* bool */ $exceptionOnNoToken = true)
   {
+    if (!$accessDecisionManager instanceof AccessDecisionManagerInterface) {
+      throw new \TypeError(sprintf('Argument 2 of "%s" must be instance of "%s", "%s" given.', __METHOD__, AccessDecisionManagerInterface::class, get_debug_type($accessDecisionManager)));
+    }
     $this->tokenStorage = $tokenStorage;
-    $this->authenticationManager = $authenticationManager;
     $this->accessDecisionManager = $accessDecisionManager;
-    $this->alwaysAuthenticate = $alwaysAuthenticate;
     $this->exceptionOnNoToken = $exceptionOnNoToken;
   }
 
@@ -82,20 +73,14 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
    */
   final public function isGranted($attribute, $subject = null): bool
   {
-    if (null === ($token = $this->tokenStorage->getToken()))
-    {
-      if ($this->exceptionOnNoToken)
-      {
-          throw new AuthenticationCredentialsNotFoundException('The token storage contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');
+    $token = $this->tokenStorage->getToken();
+    if (!$token || !$token->getUser()) {
+      if ($this->exceptionOnNoToken) {
+        throw new AuthenticationCredentialsNotFoundException('The token storage contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');
       }
       $token = new NullToken();
     }
-    else
-    {
-      if ($this->alwaysAuthenticate || !$token->isAuthenticated()) {
-        $this->tokenStorage->setToken($token = $this->authenticationManager->authenticate($token));
-      }
-    }
+
     $user = $token->getUser();
     if($user instanceof UserInterface && $user->getTypeUser() === "root")
     {
@@ -103,4 +88,5 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     }
     return $this->accessDecisionManager->decide($token, [$attribute], $subject);
   }
+
 }
