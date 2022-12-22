@@ -71,11 +71,11 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
    *
    * @throws AuthenticationCredentialsNotFoundException when the token storage has no authentication token and $exceptionOnNoToken is set to true
    */
-  final public function isGranted($attribute, $subject = null): bool
+  final public function isGranted($attribute, $subject = null, $exceptionOnNoToken = false): bool
   {
     $token = $this->tokenStorage->getToken();
     if (!$token || !$token->getUser()) {
-      if ($this->exceptionOnNoToken) {
+      if ($this->exceptionOnNoToken && $exceptionOnNoToken !== false) {
         throw new AuthenticationCredentialsNotFoundException('The token storage contains no authentication token. One possible reason may be that there is no firewall configured for this URL.');
       }
       $token = new NullToken();
