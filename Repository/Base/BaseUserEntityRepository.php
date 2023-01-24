@@ -88,7 +88,6 @@ class BaseUserEntityRepository extends EntityRepository implements EntityReposit
    */
   public function loadUserByIdentifier(string $usernameOrEmail): ?UserInterface
   {
-    dump('stop');
     return $this->retreiveByLogin($usernameOrEmail);
   }
 
