@@ -10,6 +10,7 @@
  
 namespace Austral\SecurityBundle\Security;
 
+use App\Entity\Austral\SecurityBundle\User;
 use Austral\SecurityBundle\EntityManager\Interfaces\UserEntityManagerInterface;
 
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -45,10 +46,15 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
    */
   public function loadUserByIdentifier($username): UserInterface
   {
+    /** @var User $user */
     $user = $this->findUser($username);
     if (!$user)
     {
       throw new UnsupportedUserException(sprintf('Username "%s" does not exist.', $username));
+    }
+    if (!$user->getIsActive())
+    {
+      throw new UnsupportedUserException(sprintf('Username "%s" is not actif.', $username));
     }
     return $user;
   }
@@ -58,10 +64,15 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
    */
   public function loadUserByUsername($username): UserInterface
   {
+    /** @var User $user */
     $user = $this->findUser($username);
     if (!$user)
     {
       throw new UnsupportedUserException(sprintf('Username "%s" does not exist.', $username));
+    }
+    if (!$user->getIsActive())
+    {
+      throw new UnsupportedUserException(sprintf('Username "%s" is not actif.', $username));
     }
     return $user;
   }
