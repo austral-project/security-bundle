@@ -16,25 +16,29 @@ services:
       - { name: kernel.event_listener, event: "austral.entity_manager.update", method: update }
 
 ##### User provider
+  Austral\SecurityBundle\Security\UserProvider: "@austral.security.user_provider"
   austral.security.user_provider:
     class:        Austral\SecurityBundle\Security\UserProvider
     arguments:    [ "@austral.entity_manager.user" ]
 
 ##### Old Password Hasher
+  Austral\SecurityBundle\Security\Hasher\MigratePasswordHasher: "@austral.security.hasher.migrate_password"
   austral.security.hasher.migrate_password:
     class:      Austral\SecurityBundle\Security\Hasher\MigratePasswordHasher
 
 ##### Security Checker
+  Austral\SecurityBundle\Security\Authorization\AuthorizationChecker: "@security.authorization_checker"
   security.authorization_checker:
     class: Austral\SecurityBundle\Security\Authorization\AuthorizationChecker
     arguments: [ "@security.token_storage", "@security.access.decision_manager" ]
 
 ##### Security Authenticator
-  austral.security.authenticator:
-    class:        Austral\SecurityBundle\Security\Authenticator\FormLoginAuthenticator
-    arguments:    [ "@austral.entity_manager.user", "@austral.security.user_provider","@router", "@security.csrf.token_manager", "@security.user_password_hasher" ]
+#  austral.security.authenticator:
+#    class:        Austral\SecurityBundle\Security\Authenticator\FormLoginAuthenticator
+#    arguments:    [ "@austral.entity_manager.user", "@austral.security.user_provider","@router", "@security.csrf.token_manager", "@security.user_password_hasher" ]
 
 ##### User Entity Manager
+  Austral\SecurityBundle\EntityManager\UserEntityManager: "@austral.entity_manager.user"
   austral.entity_manager.user:
     class:        Austral\SecurityBundle\EntityManager\UserEntityManager
     arguments:    ["@doctrine.orm.entity_manager",  "@event_dispatcher", "%austral.entity.user.class%"]
@@ -42,11 +46,13 @@ services:
       - setPasswordHasherFactory: [ '@security.password_hasher_factory' ]
 
 ##### Role Entity Manager
+  Austral\SecurityBundle\EntityManager\RoleEntityManager: "@austral.entity_manager.role"
   austral.entity_manager.role:
     class:        Austral\SecurityBundle\EntityManager\RoleEntityManager
     arguments:    [ "@doctrine.orm.entity_manager",  "@event_dispatcher", "%austral.entity.role.class%"]
 
 ##### Group Entity Manager
+  Austral\SecurityBundle\EntityManager\GroupEntityManager: "@austral.entity_manager.group"
   austral.entity_manager.group:
     class:        Austral\SecurityBundle\EntityManager\GroupEntityManager
     arguments:    [ "@doctrine.orm.entity_manager",  "@event_dispatcher", "%austral.entity.group.class%"]
