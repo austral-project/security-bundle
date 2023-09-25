@@ -9,6 +9,7 @@ services:
     tags: [ 'controller.service_arguments' ]
 
 ##### Listener Entity Manager
+  Austral\SecurityBundle\Listener\EntityManagerListener:  "@austral.security.entity.manager.listener"
   austral.security.entity.manager.listener:
     class:        Austral\SecurityBundle\Listener\EntityManagerListener
     arguments:    ["@event_dispatcher"]
