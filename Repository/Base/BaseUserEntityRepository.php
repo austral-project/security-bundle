@@ -15,9 +15,11 @@ use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
 use Austral\EntityBundle\Repository\EntityRepository;
 use Austral\EntityBundle\Repository\EntityRepositoryInterface;
 
+use Austral\ToolsBundle\AustralTools;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
@@ -99,16 +101,16 @@ class BaseUserEntityRepository extends EntityRepository implements EntityReposit
    */
   public function retreiveByLogin(string $login): ?UserInterface
   {
-    $query = $this->createQueryBuilder('root')
+    $queryBuilder = $this->createQueryBuilder('root')
       ->leftJoin("root.groups", "groups")->addSelect("groups")
       ->leftJoin("root.securityRoles", "securityRoles")->addSelect("securityRoles")
       ->where("root.email = :email OR root.username = :username")
       ->setParameter("email", $login)
       ->setParameter("username", $login)
-      ->setMaxResults(1)
-      ->getQuery();
+      ->setMaxResults(1);
+    $paginator = new Paginator($queryBuilder->getQuery(), true);
     try {
-      $object = $query->getSingleResult();
+      $object = AustralTools::first($paginator->getIterator()->getArrayCopy());
     } catch (NoResultException $e) {
       $object = null;
     }

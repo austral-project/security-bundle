@@ -10,6 +10,7 @@
  
 namespace Austral\SecurityBundle\Admin;
 
+use App\Entity\Austral\SecurityBundle\User;
 use Austral\AdminBundle\Admin\Admin;
 use Austral\AdminBundle\Admin\AdminModuleInterface;
 use Austral\AdminBundle\Admin\Event\DownloadAdminEvent;
@@ -23,6 +24,7 @@ use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
 
 use Austral\SecurityBundle\Form\Austral\UserForm;
 use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 
 /**
  * User Admin .
@@ -46,13 +48,23 @@ class AdminUserAdmin extends Admin implements AdminModuleInterface
    */
   public function configurationDownload(DownloadAdminEvent $downloadAdminEvent)
   {
+    $isRoot = $downloadAdminEvent->getAdminHandler()->isGranted("ROLE_ROOT");
     $downloadAdminEvent->getListMapper()
       ->getSection("default")
-        ->buildDataHydrate(function(DataHydrateORM $dataHydrate) {
-          $dataHydrate->addQueryBuilderPaginatorClosure(function(QueryBuilder $queryBuilder) {
-            return $queryBuilder->orderBy("root.username", "ASC");
-          });
-        })
+      ->buildDataHydrate(function(DataHydrateORM $dataHydrate) use($isRoot) {
+        $dataHydrate->addQueryBuilderClosure(function(QueryBuilder $queryBuilder) use($isRoot) {
+          if($isRoot) {
+            return $queryBuilder->where("root.typeUser != :userType")
+              ->setParameter("userType", "user");
+          }
+          return $queryBuilder->where("root.typeUser != :userType AND root.typeUser != :userTypeRoot")
+            ->setParameter("userType", "user")
+            ->setParameter("userTypeRoot", "root");
+        });
+        $dataHydrate->addQueryBuilderPaginatorClosure(function(QueryBuilder $queryBuilder) {
+          return $queryBuilder->orderBy("root.username", "ASC");
+        });
+      })
         ->addColumn(new Column\Value("username"))
         ->addColumn(new Column\Value("email"))
         ->addColumn(new Column\Value("typeUser"))
@@ -67,12 +79,18 @@ class AdminUserAdmin extends Admin implements AdminModuleInterface
    */
   public function configureListMapper(ListAdminEvent $listAdminEvent)
   {
+    $isRoot = $listAdminEvent->getAdminHandler()->isGranted("ROLE_ROOT");
     $listAdminEvent->getListMapper()
       ->getSection("default")
-        ->buildDataHydrate(function(DataHydrateORM $dataHydrate) {
-          $dataHydrate->addQueryBuilderClosure(function(QueryBuilder $queryBuilder) {
-            return $queryBuilder->where("root.typeUser != :userType")
-              ->setParameter("userType", "user");
+        ->buildDataHydrate(function(DataHydrateORM $dataHydrate) use($isRoot) {
+          $dataHydrate->addQueryBuilderClosure(function(QueryBuilder $queryBuilder) use($isRoot) {
+            if($isRoot) {
+              return $queryBuilder->where("root.typeUser != :userType")
+                ->setParameter("userType", "user");
+            }
+            return $queryBuilder->where("root.typeUser != :userType AND root.typeUser != :userTypeRoot")
+              ->setParameter("userType", "user")
+              ->setParameter("userTypeRoot", "root");
           });
           $dataHydrate->addQueryBuilderPaginatorClosure(function(QueryBuilder $queryBuilder) {
             return $queryBuilder->orderBy("root.username", "ASC");
@@ -99,6 +117,12 @@ class AdminUserAdmin extends Admin implements AdminModuleInterface
    */
   public function configureFormMapper(FormAdminEvent $formAdminEvent)
   {
+    $isRoot = $formAdminEvent->getAdminHandler()->isGranted("ROLE_ROOT");
+    if(!$isRoot && $formAdminEvent->getFormMapper()->getObject()->getTypeUser() === User::USER_TYPE_ROOT)
+    {
+      throw new BadCredentialsException();
+    }
+
     $language = array();
     foreach($this->container->get("austral.admin.config")->get("language.user") as $value)
     {
