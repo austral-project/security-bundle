@@ -16,14 +16,17 @@ use Austral\AdminBundle\Admin\Event\DownloadAdminEvent;
 use Austral\AdminBundle\Admin\Event\FormAdminEvent;
 use Austral\AdminBundle\Admin\Event\ListAdminEvent;
 
+use Austral\AdminBundle\Module\RolesModule;
 use Austral\FormBundle\Field as Field;
 
+use Austral\FormBundle\Mapper\GroupFields;
 use Austral\ListBundle\Column as Column;
 use Austral\ListBundle\DataHydrate\DataHydrateORM;
 
 use App\Entity\Austral\SecurityBundle\Role;
 
 use Austral\SecurityBundle\Entity\Group;
+use Austral\SecurityBundle\Entity\Interfaces\RoleInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
@@ -93,6 +96,40 @@ class GroupAdmin extends Admin implements AdminModuleInterface
       ->addFieldset("fieldset.generalInformation")
         ->add(Field\TextField::create("name"))
         ->add(Field\TextField::create("keyname", array('autoConstraints'=>false)))
+      ->end();
+
+    if($this->container->has('austral.admin.modules.roles'))
+    {
+      $fieldsetGroupManagement = $formAdminEvent->getFormMapper()
+        ->addFieldset("fieldset.rolesManagement");
+
+      $rolesModules = $this->container->get('austral.admin.modules.roles')->initialise();
+
+      /** @var RolesModule $rolesModule */
+      foreach ($rolesModules->getRolesModules() as $rolesModule)
+      {
+        $groupFirst = $fieldsetGroupManagement->addGroup($rolesModule->getModuleKeyName(), $rolesModule->getModuleName());
+        $this->createTableFields($groupFirst, $rolesModule);
+        if($rolesModule->getChildren())
+        {
+          $groupFirst->setDirection(GroupFields::DIRECTION_COLUMN);
+          /** @var RolesModule $child */
+          foreach($rolesModule->getChildren() as $child)
+          {
+            $groupSecond = $groupFirst->addGroup($child->getModuleKeyName(), $child->getModuleName());
+            $this->createTableFields($groupSecond, $child);
+          }
+        }
+        else
+        {
+          $this->createTableFields($groupFirst, $rolesModule);
+        }
+      }
+    }
+    else
+    {
+      $formAdminEvent->getFormMapper()
+        ->addFieldset("fieldset.generalInformation")
         ->add(Field\EntityField::create("roles", Role::class, array(
             "multiple"          =>  true,
             'query_builder'     =>  function (EntityRepository $er) {
@@ -100,8 +137,56 @@ class GroupAdmin extends Admin implements AdminModuleInterface
             }
           )
         ))
-      ->end();
+        ->end();
+    }
   }
+
+  /**
+   * createFields
+   *
+   * @param GroupFields $group
+   * @param RolesModule $rolesModule
+   * @return void
+   */
+  protected function createTableFields(GroupFields $group, RolesModule $rolesModule)
+  {
+    /**
+     * @var string $roleKey
+     * @var RoleInterface $role
+     */
+    foreach($rolesModule->getRoles() as $roleKey => $role)
+    {
+      $group->add(Field\SwitchField::create($roleKey, array(
+        "entitled"  =>  $role["name"],
+        "setter"  =>  function(Group $group, $value) use($role, $rolesModule)  {
+          if($value)
+          {
+            $group->addRole($role['object']);
+            if($parent = $rolesModule->getParent())
+            {
+              foreach ($parent->getRoles() as $roleParent)
+              {
+                $group->addRole($roleParent['object']);
+              }
+            }
+          }
+          else
+          {
+            $group->removeRole($role['object']);
+          }
+        },
+        'getter'  =>  function(Group $group) use($role) {
+          $enabled = false;
+          if(in_array($role['object']->getRole(), $group->getRolesArray()))
+          {
+            $enabled = true;
+          }
+          return $enabled;
+        }
+      )));
+    }
+  }
+
 
   /**
    * @param FormAdminEvent $formAdminEvent

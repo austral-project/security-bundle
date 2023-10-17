@@ -179,7 +179,26 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   {
     return $this->roles;
   }
-    
+
+  /**
+   * getRolesArray
+   *
+   * @return array
+   */
+  public function getRolesArray(): array
+  {
+    $groupRoles = array();
+    /** @var RoleInterface $role */
+    foreach($this->getRoles() as $role)
+    {
+      if(!in_array($role->getRole(), $groupRoles))
+      {
+        $groupRoles[] = $role->getRole();
+      }
+    }
+    return $groupRoles;
+  }
+
   /**
    * Set name
    *
