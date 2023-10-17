@@ -58,7 +58,7 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   protected $id;
 
   /**
-   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\RoleInterface", inversedBy="users", cascade={"persist", "remove"})
+   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\RoleInterface", inversedBy="users", cascade={"persist"})
    * @ORM\JoinTable(name="austral_security_user_role",
    *   joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
    *   inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
@@ -67,7 +67,7 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   protected Collection $securityRoles;
 
   /**
-   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\GroupInterface", inversedBy="users", cascade={"persist", "remove"})
+   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\GroupInterface", inversedBy="users", cascade={"persist"})
    * @ORM\JoinTable(name="austral_security_user_group",
    *   joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
    *   inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}

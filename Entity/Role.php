@@ -42,12 +42,12 @@ abstract class Role extends Entity implements RoleInterface, EntityInterface
   protected $id;
 
   /**
-   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\UserInterface", mappedBy="securityRoles", cascade={"persist", "remove"})
+   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\UserInterface", mappedBy="securityRoles", cascade={"persist"})
    */
   protected Collection $users;
   
   /**
-   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\GroupInterface", mappedBy="roles", cascade={"persist", "remove"})
+   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\GroupInterface", mappedBy="roles", cascade={"persist"})
    */
   protected Collection $groups;
 

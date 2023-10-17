@@ -41,12 +41,12 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   protected $id;
 
   /**
-   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\UserInterface", mappedBy="groups", cascade={"persist", "remove"})
+   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\UserInterface", mappedBy="groups", cascade={"persist"})
    */
   protected Collection $users;
 
   /**
-   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\RoleInterface", inversedBy="groups", cascade={"persist", "remove"})
+   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\RoleInterface", inversedBy="groups", cascade={"persist"})
    * @ORM\JoinTable(name="austral_security_role_group",
    *   joinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")},
    *   inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
