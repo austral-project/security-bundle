@@ -13,8 +13,10 @@ namespace Austral\SecurityBundle\Admin;
 use Austral\AdminBundle\Admin\Admin;
 use Austral\AdminBundle\Admin\AdminModuleInterface;
 use Austral\AdminBundle\Admin\Event\DownloadAdminEvent;
+use Austral\AdminBundle\Admin\Event\FilterEventInterface;
 use Austral\AdminBundle\Admin\Event\FormAdminEvent;
 use Austral\AdminBundle\Admin\Event\ListAdminEvent;
+use Austral\FilterBundle\Filter\Type as FilterType;
 
 use Austral\ListBundle\Column as Column;
 use Austral\ListBundle\DataHydrate\DataHydrateORM;
@@ -41,6 +43,19 @@ class UserAdmin extends Admin implements AdminModuleInterface
     return array(
       FormAdminEvent::EVENT_UPDATE_BEFORE =>  "formUpdateBefore"
     );
+  }
+
+  /**
+   * @param FilterEventInterface $listAdminEvent
+   *
+   * @throws \Exception
+   */
+  public function configureFilterMapper(FilterEventInterface $listAdminEvent)
+  {
+    $listAdminEvent->getFilterMapper()->filter("default")
+      ->add(new FilterType\StringType("email"))
+      ->add(new FilterType\StringType("firstname"))
+      ->add(new FilterType\StringType("lastname"));
   }
 
   /**
@@ -80,6 +95,7 @@ class UserAdmin extends Admin implements AdminModuleInterface
             return $queryBuilder->orderBy("root.username", "ASC");
           });
         })
+        ->setMaxResult(100)
         ->addColumn(new Column\Image("avatar", null, array(), "@AustralSecurity/List/Components/avatar.html.twig"))
         ->addColumn(new Column\Value("username"))
         ->addColumn(new Column\Value("email"))
