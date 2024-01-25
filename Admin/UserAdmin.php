@@ -66,6 +66,10 @@ class UserAdmin extends Admin implements AdminModuleInterface
     $downloadAdminEvent->getListMapper()
       ->getSection("default")
         ->buildDataHydrate(function(DataHydrateORM $dataHydrate) {
+          $dataHydrate->addQueryBuilderClosure(function(QueryBuilder $queryBuilder) {
+            return $queryBuilder->where("root.typeUser = :userType")
+              ->setParameter("userType", "user");
+          });
           $dataHydrate->addQueryBuilderPaginatorClosure(function(QueryBuilder $queryBuilder) {
             return $queryBuilder->orderBy("root.username", "ASC");
           });
