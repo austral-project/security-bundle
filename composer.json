@@ -21,9 +21,9 @@
     "austral/entity-bundle":                  "^3.1",
 
     "doctrine/annotations":                   "^1.0",
-    "doctrine/doctrine-bundle":               "^2.2",
+    "doctrine/doctrine-bundle":               "^2.12.0",
     "doctrine/doctrine-migrations-bundle":    "^3.0",
-    "doctrine/orm":                           "^2.7",
+    "doctrine/orm":                           "^3.2",
 
     "symfony/console":                        "^5.4 || ^6.4",
     "symfony/security-bundle":                "^5.4 || ^6.4",
