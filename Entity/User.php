@@ -363,9 +363,9 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * @return string|null
+   * @return string
    */
-  public function getUserIdentifier(): ?string
+  public function getUserIdentifier(): string
   {
     return $this->username;
   }

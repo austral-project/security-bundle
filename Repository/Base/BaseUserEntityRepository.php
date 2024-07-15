@@ -21,6 +21,7 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
@@ -28,7 +29,7 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @abstract
  */
-class BaseUserEntityRepository extends EntityRepository implements EntityRepositoryInterface, UserLoaderInterface, PasswordUpgraderInterface
+abstract class BaseUserEntityRepository extends EntityRepository implements EntityRepositoryInterface, UserLoaderInterface, PasswordUpgraderInterface
 {
 
   /**
@@ -120,12 +121,12 @@ class BaseUserEntityRepository extends EntityRepository implements EntityReposit
   /**
    * upgradePassword
    *
-   * @param UserInterface $user
+   * @param UserInterface|PasswordAuthenticatedUserInterface $user
    * @param string $newHashedPassword
    *
    * @return void
    */
-  public function upgradePassword(UserInterface $user, string $newHashedPassword): void
+  public function upgradePassword(UserInterface|\Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
   {
     // set the new hashed password on the User object
     $user->setPassword($newHashedPassword);
