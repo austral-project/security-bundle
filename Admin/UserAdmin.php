@@ -140,7 +140,7 @@ class UserAdmin extends Admin implements AdminModuleInterface
     $object = $formAdminEvent->getFormMapper()->getObject();
     if($object->getId() === $formAdminEvent->getAdminHandler()->getUser()->getId())
     {
-      $this->container->get("session")->set("austral_language_interface", $object->getLanguage());
+      $this->container->get("austral.admin.handler")->getSession()->set("austral_language_interface", $object->getLanguage());
       $this->container->get("translator")->setLocale($object->getLanguage());
     }
     if(!$object->getTypeUser())
