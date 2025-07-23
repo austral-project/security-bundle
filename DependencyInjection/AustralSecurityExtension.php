@@ -26,7 +26,7 @@ class AustralSecurityExtension extends Extension
    * {@inheritdoc}
    * @throws \Exception
    */
-  public function load(array $configs, ContainerBuilder $container)
+  public function load(array $configs, ContainerBuilder $container): void
   {
     $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
     $loader->load('command.yaml');
@@ -43,7 +43,7 @@ class AustralSecurityExtension extends Extension
    * @return void
    * @throws \Exception
    */
-  protected function loadConfigToAustralManagerBundle(ContainerBuilder $container, YamlFileLoader $loader)
+  protected function loadConfigToAustralManagerBundle(ContainerBuilder $container, YamlFileLoader $loader): void
   {
     $bundlesConfigPath = $container->getParameter("kernel.project_dir")."/config/bundles.php";
     if(file_exists($bundlesConfigPath))
