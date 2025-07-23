@@ -109,7 +109,7 @@ abstract class BaseUserEntityRepository extends EntityRepository implements Enti
       ->setParameter("email", $login)
       ->setParameter("username", $login)
       ->setMaxResults(1);
-    $paginator = new Paginator($queryBuilder->getQuery(), true);
+    $paginator = new Paginator($queryBuilder->getQuery(), false);
     try {
       $object = AustralTools::first($paginator->getIterator()->getArrayCopy());
     } catch (NoResultException $e) {
