@@ -1,0 +1,15 @@
+name: CI
+
+on:
+  push:
+    branches: ["4.x"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    uses: austral-project/.github/.github/workflows/bundle-ci.yml@master

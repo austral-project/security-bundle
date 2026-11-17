@@ -1,0 +1,10 @@
+includes:
+  - vendor/phpstan/phpstan-symfony/extension.neon
+
+parameters:
+  # Raise progressively to level 8 during V4
+  level: 6
+  paths:
+    - src
+    - tests
+  tmpDir: var/phpstan

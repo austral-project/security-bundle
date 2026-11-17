@@ -1,0 +1,8 @@
+version: 2
+updates:
+  # Keeps GitHub Actions up to date (PHP dependencies are handled by the composer constraints)
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: "4.x"
+    schedule:
+      interval: monthly
