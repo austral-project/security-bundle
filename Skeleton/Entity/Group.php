@@ -11,7 +11,6 @@
 namespace App\Entity\Austral\SecurityBundle;
 
 use Austral\SecurityBundle\Entity\Group as BaseGroup;
-use Austral\SecurityBundle\Entity\Interfaces\GroupInterface;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -19,15 +18,14 @@ use Doctrine\ORM\Mapping as ORM;
  * Austral Group Entity.
  *
  * @author Matthieu Beurel <matthieu@austral.dev>
- *
- * @ORM\Table(name="austral_security_group")
- * @ORM\Entity(repositoryClass="Austral\SecurityBundle\Repository\GroupRepository")
- * @ORM\HasLifecycleCallbacks
  */
-class Group extends BaseGroup implements GroupInterface
+#[ORM\Table(name: "austral_security_group")]
+#[ORM\Entity(repositoryClass: \Austral\SecurityBundle\Repository\GroupRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+class Group extends BaseGroup
 {
   /**
-   * User constructor.
+   * Constructor.
    * @throws \Exception
    */
   public function __construct()

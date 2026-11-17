@@ -18,6 +18,9 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 /**
  * Austral Authenticated Controller.
+ * @template T of object
+ *
+ * @extends HttpController<T>
  *
  * @author Matthieu Beurel <matthieu@austral.dev>
  *
@@ -27,15 +30,22 @@ class AuthenticatedController extends HttpController
 {
 
   /**
-   * @param Request $request
+   * login
    *
-   * @return Response
+   * @param AuthenticationUtils $authenticationUtils
+   * @param Request $request
+   * @return RedirectResponse|Response
+   * @throws \Twig\Error\LoaderError
+   * @throws \Twig\Error\RuntimeError
+   * @throws \Twig\Error\SyntaxError
    */
-  public function login(AuthenticationUtils $authenticationUtils, Request $request)
+  public function login(AuthenticationUtils $authenticationUtils, Request $request): RedirectResponse|Response
   {
     if ($this->getUser())
     {
-      return new RedirectResponse($this->generateUrl($this->container->getParameter("security_login_redirect"), array()), 302);
+      $redirectRouteName = $this->container->getParameter("security_login_redirect");
+      $redirectRouteName = is_string($redirectRouteName) ? $redirectRouteName : "austral_admin_dashboard";
+      return new RedirectResponse($this->generateUrl($redirectRouteName), 302);
     }
     $error = $authenticationUtils->getLastAuthenticationError();
     $lastUsername = $authenticationUtils->getLastUsername();
@@ -49,7 +59,7 @@ class AuthenticatedController extends HttpController
   /**
    * Logout is blank method
    */
-  public function logout()
+  public function logout(): void
   {
     throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
   }

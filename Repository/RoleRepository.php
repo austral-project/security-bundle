@@ -11,23 +11,27 @@
 namespace Austral\SecurityBundle\Repository;
 
 use Austral\EntityBundle\Repository\EntityRepository;
-use Austral\EntityBundle\Repository\EntityRepositoryInterface;
-use Doctrine\Common\Collections\ArrayCollection;
+use Austral\SecurityBundle\Entity\Interfaces\RoleInterface;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Query\QueryException;
 
 /**
  * Austral Role Repository.
+ * @template T of object
+ *
+ * @extends EntityRepository<T>
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @final
  */
-class RoleRepository extends EntityRepository implements EntityRepositoryInterface
+class RoleRepository extends EntityRepository
 {
 
   /**
-   * @return ArrayCollection|array
+   * @return Collection<int, RoleInterface<T>>
    * @throws QueryException
    */
-  public function selectRoles()
+  public function selectRoles(): Collection
   {
     $query = $this->createQueryBuilder('root')
       ->indexBy("root", "root.role")
@@ -36,7 +40,7 @@ class RoleRepository extends EntityRepository implements EntityRepositoryInterfa
       ->getQuery();
     try {
       $objects = $query->execute();
-    } catch (\Doctrine\Orm\NoResultException $e) {
+    } catch (\Exception $e) {
       $objects = array();
     }
     return $objects;

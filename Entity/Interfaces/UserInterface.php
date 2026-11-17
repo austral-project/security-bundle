@@ -10,16 +10,33 @@
 
 namespace Austral\SecurityBundle\Entity\Interfaces;
 
+use Austral\Contracts\Entity\EntityInterface;
+use Austral\Contracts\File\FileInterface;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface as SymfonyCoreUserInterface;
 
 /**
  * Austral Interface User.
  *
+ * @template T of object
+ *
+ * @extends EntityInterface<T>
+ * @extends FileInterface<T>
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  */
-interface UserInterface extends SymfonyCoreUserInterface
+interface UserInterface extends SymfonyCoreUserInterface, EntityInterface, PasswordAuthenticatedUserInterface, FileInterface
 {
+
+  const string USER_TYPE_ROOT = "root";
+  const string USER_TYPE_ADMIN = "admin";
+  const string USER_TYPE_USER = "user";
+
+  const string USER_INTERFACE_AUTO = "auto";
+  const string USER_INTERFACE_DARK = "dark";
+  const string USER_INTERFACE_LIGHT = "light";
+
 
   /**
    * @return bool
@@ -35,254 +52,205 @@ interface UserInterface extends SymfonyCoreUserInterface
    */
   public function isUser(): bool;
 
-  public function eraseCredentials();
-
   /**
-   * Add role
-   *
-   * @param RoleInterface $role
-   * @return $this
-   */
-  public function addSecurityRole(RoleInterface $role): UserInterface;
-
-  /**
-   * Remove securityRole
-   *
-   * @param RoleInterface $role
+   * @param RoleInterface<T> $role
    *
    * @return $this
    */
-  public function removeSecurityRole(RoleInterface $role): UserInterface;
+  public function addSecurityRole(RoleInterface $role): self;
+
+  /**
+   * @param RoleInterface<T> $role
+   *
+   * @return $this
+   */
+  public function removeSecurityRole(RoleInterface $role): self;
 
   /**
    * Get securityRoles
-   * @return Collection
+   * @return Collection<int|string, RoleInterface<T>>
    */
   public function getSecurityRoles(): Collection;
 
   /**
-   * @return array
+   * @return list<string>
    */
   public function getRoles(): array;
 
   /**
-   * Add group
-   *
-   * @param GroupInterface $group
-   * @return $this
-   */
-  public function addGroup(GroupInterface $group): UserInterface;
-
-  /**
-   * Remove group
-   *
-   * @param GroupInterface $group
+   * @param GroupInterface<T> $group
    *
    * @return $this
    */
-  public function removeGroup(GroupInterface $group): UserInterface;
+  public function addGroup(GroupInterface $group): self;
 
   /**
-   * Get groups
+   * @param GroupInterface<T> $group
    *
-   * @return Collection
+   * @return $this
+   */
+  public function removeGroup(GroupInterface $group): self;
+
+  /**
+   * @return Collection<int|string, GroupInterface<T>>
    */
   public function getGroups(): Collection;
 
   /**
-   * Get username
-   * @return string|null
+   * @return string
    */
-  public function getUsername(): ?string;
+  public function getUsername(): string;
 
   /**
-   * Set username
-   *
    * @param string $username
    *
    * @return $this
    */
-  public function setUsername(string $username): UserInterface;
+  public function setUsername(string $username): self;
 
   /**
-   * Get email
-   * @return string|null
+   * @return string
    */
-  public function getEmail(): ?string;
+  public function getEmail(): string;
 
   /**
-   * Set email
-   *
    * @param string $email
    *
    * @return $this
    */
-  public function setEmail(string $email): UserInterface;
+  public function setEmail(string $email): self;
 
   /**
-   * Get firstname
    * @return string|null
    */
   public function getFirstname(): ?string;
 
   /**
-   * Set firstname
-   *
    * @param string|null $firstname
    *
    * @return $this
    */
-  public function setFirstname(?string $firstname): UserInterface;
+  public function setFirstname(?string $firstname): self;
 
   /**
-   * Get lastname
-   * @return string
+   * @return string|null
    */
   public function getLastname(): ?string;
 
   /**
-   * Set lastname
-   *
    * @param string|null $lastname
    *
    * @return $this
    */
-  public function setLastname(?string $lastname): UserInterface;
+  public function setLastname(?string $lastname): self;
 
   /**
-   * Get avatar
-   * @return string
+   * @return string|null
    */
   public function getAvatar(): ?string;
 
   /**
-   * Set avatar
-   *
    * @param string|null $avatar
    *
    * @return $this
    */
-  public function setAvatar(?string $avatar): UserInterface;
+  public function setAvatar(?string $avatar): self;
 
   /**
-   * Get avatarColor
-   * @return string
+   * @return string|null
    */
   public function getAvatarColor(): ?string;
 
   /**
-   * Set avatarColor
-   *
    * @param string|null $avatarColor
    *
    * @return $this
    */
-  public function setAvatarColor(?string $avatarColor): UserInterface;
+  public function setAvatarColor(?string $avatarColor): self;
 
   /**
-   * Get language
    * @return string|null
    */
   public function getLanguage(): ?string;
 
   /**
-   * Set language
-   *
    * @param string|null $language
    *
    * @return $this
    */
-  public function setLanguage(?string $language): UserInterface;
+  public function setLanguage(?string $language): self;
 
   /**
-   * Get password
    * @return string|null
    */
   public function getPassword(): ?string;
 
   /**
-   * Set password
-   *
    * @param string $password
    *
    * @return $this
    */
-  public function setPassword(string $password): UserInterface;
+  public function setPassword(string $password): self;
 
   /**
-   * Get salt
    * @return string|null
    */
   public function getSalt(): ?string;
 
   /**
-   * Set salt
-   *
    * @param string $salt
    *
    * @return $this
    */
-  public function setSalt(string $salt): UserInterface;
+  public function setSalt(string $salt): self;
 
   /**
-   * Get plainPassword
-   * @return string
+   * @return string|null
    */
   public function getPlainPassword(): ?string;
 
   /**
-   * Set plainPassword
-   *
    * @param string|null $plainPassword
    *
    * @return $this
    */
-  public function setPlainPassword(?string $plainPassword): UserInterface;
+  public function setPlainPassword(?string $plainPassword): self;
 
   /**
-   * Get isActive
    * @return bool
    */
   public function getIsActive(): bool;
 
   /**
-   * Set isActive
-   *
    * @param bool $isActive
    *
    * @return $this
    */
-  public function setIsActive(bool $isActive): UserInterface;
+  public function setIsActive(bool $isActive): self;
 
   /**
-   * Get forgotPasswordToken
    * @return string|null
    */
   public function getForgotPasswordToken(): ?string;
 
   /**
-   * Set forgotPasswordToken
-   *
    * @param string|null $forgotPasswordToken
    *
    * @return $this
    */
-  public function setForgotPasswordToken(?string $forgotPasswordToken): UserInterface;
+  public function setForgotPasswordToken(?string $forgotPasswordToken): self;
 
   /**
-   * Get typeUser
    * @return string|null
    */
   public function getTypeUser(): ?string;
 
   /**
-   * Set typeUser
-   *
    * @param string|null $typeUser
    *
    * @return $this
    */
-  public function setTypeUser(?string $typeUser): UserInterface;
+  public function setTypeUser(?string $typeUser): self;
 
   /**
    * @return string|null
@@ -294,5 +262,5 @@ interface UserInterface extends SymfonyCoreUserInterface
    *
    * @return $this
    */
-  public function setInterfaceTheme(?string $interfaceTheme): UserInterface;
+  public function setInterfaceTheme(?string $interfaceTheme): self;
 }

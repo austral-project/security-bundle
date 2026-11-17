@@ -10,43 +10,66 @@
  
 namespace Austral\SecurityBundle\Security;
 
-use App\Entity\Austral\SecurityBundle\User;
+use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
 use Austral\SecurityBundle\EntityManager\Interfaces\UserEntityManagerInterface;
 
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 
 /**
  * User provider.
+ * @template T of object
+ * @template TUser of UserInterface
+ * @implements UserProviderInterface<TUser>
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  */
 class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
 {
     
   /**
-   * @var UserEntityManagerInterface
+   * @var UserEntityManagerInterface<T>
    */
   protected UserEntityManagerInterface $userManager;
 
   /**
    * Constructor.
    *
-   * @param UserEntityManagerInterface $userManager
+   * @param UserEntityManagerInterface<T> $userManager
    */
   public function __construct(UserEntityManagerInterface $userManager)
   {
     $this->userManager = $userManager;
   }
-    
+
   /**
-   * {@inheritDoc}
+   * @param string $identifier
+   * @return UserInterface<T>
    */
-  public function loadUserByIdentifier($username): UserInterface
+  public function loadUserByIdentifier(string $identifier): UserInterface
   {
-    /** @var User $user */
+    /** @var UserInterface<T>|null $user */
+    $user = $this->findUser($identifier);
+    if (!$user)
+    {
+      throw new UnsupportedUserException(sprintf('Username "%s" does not exist.', $identifier));
+    }
+    if (!$user->getIsActive())
+    {
+      throw new UnsupportedUserException(sprintf('Username "%s" is not actif.', $identifier));
+    }
+    return $user;
+  }
+
+  /**
+   * @param string $username
+   * @return UserInterface<T>
+   */
+  public function loadUserByUsername(string $username): UserInterface
+  {
+    /** @var UserInterface<T>|null $user */
     $user = $this->findUser($username);
     if (!$user)
     {
@@ -60,27 +83,12 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
   }
 
   /**
-   * {@inheritDoc}
+   * refreshUser
+   *
+   * @param \Symfony\Component\Security\Core\User\UserInterface $user
+   * @return UserInterface<T>
    */
-  public function loadUserByUsername($username): UserInterface
-  {
-    /** @var User $user */
-    $user = $this->findUser($username);
-    if (!$user)
-    {
-      throw new UnsupportedUserException(sprintf('Username "%s" does not exist.', $username));
-    }
-    if (!$user->getIsActive())
-    {
-      throw new UnsupportedUserException(sprintf('Username "%s" is not actif.', $username));
-    }
-    return $user;
-  }
-    
-  /**
-   * {@inheritDoc}
-   */
-  public function refreshUser(UserInterface $user): UserInterface
+  public function refreshUser( \Symfony\Component\Security\Core\User\UserInterface $user): UserInterface
   {
     if (!$user instanceof UserInterface)
     {
@@ -92,23 +100,20 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
   /**
    * {@inheritDoc}
    */
-  public function supportsClass($class): bool
+  public function supportsClass(string $class): bool
   {
-    $userClass = $this->userManager->getClass();
+    $userClass = $this->userManager->getClass() ?? UserInterface::class;
     return $userClass === $class || is_subclass_of($class, $userClass);
   }
 
   /**
-   * Finds a user by username.
-   * This method is meant to be an extension point for child classes.
-   *
    * @param string $username
    *
-   * @return UserInterface|null
+   * @return UserInterface<T>|null
    */
   protected function findUser(string $username): ?UserInterface
   {
-    return $this->userManager->retreiveByLogin($username);
+    return $this->userManager->retrieveByLogin($username);
   }
 
   /**
@@ -121,8 +126,13 @@ class UserProvider implements UserProviderInterface, PasswordUpgraderInterface
    */
   public function upgradePassword(PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
   {
-    $user->setPassword($newHashedPassword);
-    $this->userManager->update($user);
+    if($user instanceof UserInterface)
+    {
+      /** @var UserInterface<T> $userEntity */
+      $userEntity = $user;
+      $userEntity->setPassword($newHashedPassword);
+      $this->userManager->update($userEntity);
+    }
   }
 
 }

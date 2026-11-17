@@ -14,16 +14,19 @@ use Austral\SecurityBundle\EntityManager\Interfaces\UserEntityManagerInterface;
 use Austral\SecurityBundle\Repository\UserRepository;
 use Austral\SecurityBundle\Entity\Interfaces\UserInterface as AustralUserInterface;
 
-use Austral\EntityBundle\Entity\EntityInterface;
 use Austral\EntityBundle\EntityManager\EntityManager;
 
-use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Austral User Manager.
+ * @template T of object
+ *
+ * @extends EntityManager<T>
+ * @implements UserEntityManagerInterface<T>
  *
  * @author Matthieu Beurel <matthieu@austral.dev>
  *
@@ -33,14 +36,32 @@ class UserEntityManager extends EntityManager implements UserEntityManagerInterf
 {
 
   /**
-   * @var UserRepository
+   * @param class-string<T>|null $entity
+   * @return UserRepository<T>|null
    */
-  protected $repository;
+  public function getRepository(?string $entity = null): ?UserRepository
+  {
+    /** @var UserRepository<T>|null $repository */
+    $repository = $this->repository;
+    return $repository;
+  }
 
   /**
-   * @var PasswordHasherFactoryInterface
+   * @param array<string, mixed> $values
+   *
+   * @return AustralUserInterface<T>
    */
-  protected PasswordHasherFactoryInterface $passwordHasherFactory;
+  public function create(array $values = array()): AustralUserInterface
+  {
+    /** @var AustralUserInterface<T> $object */
+    $object = parent::create($values);
+    return $object;
+  }
+
+  /**
+   * @var PasswordHasherFactoryInterface|null
+   */
+  protected ?PasswordHasherFactoryInterface $passwordHasherFactory = null;
 
 
   /**
@@ -48,97 +69,73 @@ class UserEntityManager extends EntityManager implements UserEntityManagerInterf
    *
    * @return $this
    */
-  public function setPasswordHasherFactory(PasswordHasherFactoryInterface $passwordHasherFactory): UserEntityManager
+  public function setPasswordHasherFactory(PasswordHasherFactoryInterface $passwordHasherFactory): self
   {
     $this->passwordHasherFactory = $passwordHasherFactory;
     return $this;
   }
 
   /**
-   * @param string $email
-   *
-   * @return UserInterface|null
-   * @throws NonUniqueResultException
+   * @inheritDoc
    */
-  public function retreiveByEmail(string $email): ?UserInterface
+  public function retrieveByEmail(string $email): ?AustralUserInterface
   {
-    return $this->repository->retreiveByEmail($email);
+    return $this->getRepository()?->retrieveByEmail($email) ?? null;
   }
 
   /**
-   * @param string $login
-   *
-   * @return UserInterface|null
-   * @throws NonUniqueResultException
+   * @inheritDoc
    */
-  public function retreiveByLogin(string $login): ?UserInterface
+  public function retrieveByLogin(string $login): ?AustralUserInterface
   {
-    return $this->repository->retreiveByLogin($login);
+    return $this->getRepository()?->retrieveByLogin($login) ?? null;
   }
 
   /**
-   * @param UserInterface|EntityInterface $user
+   * @param AustralUserInterface<T> $user
    *
-   * @return UserEntityManager
+   * @return $this
    */
-  public function deleteUser(UserInterface $user): UserEntityManager
+  public function deleteUser(AustralUserInterface $user): self
   {
     return $this->delete($user);
   }
 
   /**
-   * Updates a user.
-   *
-   * @param UserInterface|EntityInterface|AustralUserInterface $user
+   * @param AustralUserInterface<T> $user
    * @param bool $andFlush Whether to flush the changes (default true)
    *
    * @return $this
    */
-  public function updateUser(UserInterface $user, bool $andFlush = true): UserEntityManager
+  public function updateUser(UserInterface $user, bool $andFlush = true): self
   {
     $this->updatePassword($user);
     return parent::update($user, $andFlush);
   }
 
   /**
-   * @param array $values
+   * @param AustralUserInterface<T> $user
    *
-   * @return UserInterface
-   * @throws \Exception
+   * @return $this
    */
-  public function create(array $values = array()): UserInterface
+  public function updatePassword(UserInterface $user): self
   {
-    /** @var UserInterface|EntityInterface|AustralUserInterface $object */
-    $object = parent::create($values);
-    $object->hydrate($values);
-    $object->setSalt(bin2hex(random_bytes(20)));
-    return $object;
-  }
-
-  /**
-   * @param UserInterface|EntityInterface|AustralUserInterface $user
-   *
-   * @return UserEntityManager
-   */
-  public function updatePassword(UserInterface $user): UserEntityManager
-  {
-    if (0 !== strlen($password = $user->getPlainPassword()))
+    $encoder = $this->getEncoder($user);
+    if($encoder && $user->getPlainPassword() && (0 !== strlen($password = $user->getPlainPassword())))
     {
-      $encoder = $this->getEncoder($user);
-      $user->setPassword($encoder->hash($password, $user->getSalt()));
-      $user->eraseCredentials();
+      $user->setPassword($encoder->hash($password."@".$user->getSalt()));
     }
     return $this;
   }
 
   /**
-   * @param UserInterface $user
+   * @param PasswordAuthenticatedUserInterface $user
    *
-   * @return PasswordHasherInterface
+   * @return PasswordHasherInterface|null
    */
-  protected function getEncoder(UserInterface $user): PasswordHasherInterface
+  protected function getEncoder(PasswordAuthenticatedUserInterface $user): ?PasswordHasherInterface
   {
-    return $this->passwordHasherFactory->getPasswordHasher($user);
+    return $this->passwordHasherFactory?->getPasswordHasher($user);
   }
 
 }

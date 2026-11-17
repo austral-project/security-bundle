@@ -14,6 +14,10 @@ use Austral\SecurityBundle\Repository\Base\BaseUserEntityRepository;
 
 /**
  * Austral User Repository.
+ * @template T of object
+ *
+ * @extends BaseUserEntityRepository<T>
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @final
  */

@@ -13,42 +13,34 @@ namespace Austral\SecurityBundle\Listener;
 use Austral\EntityBundle\Event\EntityManagerEvent;
 
 use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Austral\SecurityBundle\EntityManager\Interfaces\UserEntityManagerInterface;
 
 /**
  * Austral EntityManager Listener.
+ * @template T of object
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @final
  */
-class EntityManagerListener implements EventSubscriberInterface
+class EntityManagerListener
 {
 
-  /**
-   * @var EventDispatcherInterface
-   */
-  protected EventDispatcherInterface $dispatcher;
-
-  public function __construct(EventDispatcherInterface $dispatcher)
+  public function __construct()
   {
-    $this->dispatcher = $dispatcher;
-  }
-
-  public static function getSubscribedEvents(): array
-  {
-    return [
-      EntityManagerEvent::EVENT_UPDATE => 'update',
-    ];
   }
 
   /**
-   * @param EntityManagerEvent $entityManagerEvent
+   * @param EntityManagerEvent<T> $entityManagerEvent
    */
-  public function update(EntityManagerEvent $entityManagerEvent)
+  public function update(EntityManagerEvent $entityManagerEvent): void
   {
-    if($entityManagerEvent->getObject() instanceof UserInterface)
+    $object = $entityManagerEvent->getObject();
+
+    /** @var UserEntityManagerInterface<T> $entityUserManager */
+    $entityUserManager = $entityManagerEvent->getEntityManager();
+    if($object instanceof UserInterface)
     {
-      $entityManagerEvent->getEntityManager()->updatePassword($entityManagerEvent->getObject());
+      $entityUserManager->updatePassword($object);
     }
   }
 

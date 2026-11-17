@@ -10,87 +10,83 @@
 
 namespace Austral\SecurityBundle\Entity\Interfaces;
 
+use Austral\Contracts\Entity\EntityInterface;
 use Doctrine\Common\Collections\Collection;
 
 /**
  * Austral Interface Group.
+ * @template T of object
+ *
+ * @extends EntityInterface<T>
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  */
-interface GroupInterface
+interface GroupInterface extends EntityInterface
 {
 
   /**
-   * Add user
-   *
-   * @param UserInterface $user
+   * @param UserInterface<T> $user
    * @return $this
    */
-  public function addUser(UserInterface $user): GroupInterface;
+  public function addUser(UserInterface $user): self;
 
   /**
-   * Remove users
-   *
-   * @param UserInterface $user
+   * @param UserInterface<T> $user
    *
    * @return $this
    */
-  public function removeUser(UserInterface $user): GroupInterface;
+  public function removeUser(UserInterface $user): self;
 
   /**
-   * Get users
-   * @return Collection
+   * @return Collection<int|string, UserInterface<T>>
    */
   public function getUsers(): Collection;
 
   /**
-   * Add role
-   *
-   * @param RoleInterface $role
-   * @return $this
-   */
-  public function addRole(RoleInterface $role): GroupInterface;
-
-  /**
-   * Remove role
-   *
-   * @param RoleInterface $role
+   * @param RoleInterface<T> $role
    *
    * @return $this
    */
-  public function removeRole(RoleInterface $role): GroupInterface;
+  public function addRole(RoleInterface $role): self;
 
   /**
-   * Get role
-   * @return Collection
+   * @param RoleInterface<T> $role
+   *
+   * @return $this
+   */
+  public function removeRole(RoleInterface $role): self;
+
+  /**
+   * @return Collection<int|string, RoleInterface<T>>
    */
   public function getRoles(): Collection;
 
   /**
-   * Set name
-   *
+   * @return list<string>
+   */
+  public function getRolesArray(): array;
+
+  /**
    * @param string $name
    * @return $this
    */
-  public function setName(string $name): GroupInterface;
+  public function setName(string $name): self;
 
   /**
-   * Get name
+   * @return string
+   */
+  public function getName(): string;
+
+  /**
+   * @return string
+   */
+  public function getKeyname(): string;
+
+  /**
+   * @param string $keyname
    *
-   * @return string|null
+   * @return $this
    */
-  public function getName(): ?string;
-
-  /**
-   * Get keyname
-   * @return string|null
-   */
-  public function getKeyname(): ?string;
-
-  /**
-   * @param string|null $keyname
-   *
-   * @return GroupInterface
-   */
-  public function setKeyname(string $keyname = null): GroupInterface;
+  public function setKeyname(string $keyname): self;
 
 }

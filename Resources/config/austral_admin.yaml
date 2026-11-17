@@ -6,7 +6,6 @@ services:
 
   austral.security.dashboard.listener:
     class: Austral\SecurityBundle\Listener\DashboardListener
-    arguments: [ "@service_container", "@request_stack" ]
     tags:
       - { name: kernel.event_listener, event: "austral.event.admin.dashboard", method: dashboard }
 

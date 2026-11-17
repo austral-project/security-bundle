@@ -13,12 +13,15 @@ namespace Austral\SecurityBundle\Listener;
 use Austral\AdminBundle\Event\DashboardEvent;
 
 use Austral\AdminBundle\Dashboard\Values as DashboardValues;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Austral\AdminBundle\Module\Modules;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Austral DashboardListener Listener.
+ * @template T of object
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @final
  */
@@ -26,68 +29,74 @@ class DashboardListener
 {
 
   /**
-   * @var ContainerInterface
-   */
-  protected ContainerInterface $container;
-  /**
    * @var Request|null
    */
-  protected ?Request $request;
+  protected ?Request $request = null;
 
   /**
-   * @param ContainerInterface $container
-   * @param RequestStack $requestStack
+   * DashboardListener constructor
+   *
+   * @param Modules<T> $modules
    */
-  public function __construct(ContainerInterface $container, RequestStack $requestStack)
+  public function __construct(
+    #[Autowire(service: "austral.admin.modules")] protected Modules $modules,
+  )
   {
-    $this->container = $container;
+  }
+
+  /**
+   * setRequestStack
+   *
+   * @param RequestStack $requestStack
+   * @return $this
+   */
+  public function setRequestStack(RequestStack $requestStack): self
+  {
     $this->request = $requestStack->getCurrentRequest();
+    return $this;
   }
 
 
   /**
-   * @param DashboardEvent $dashboardEvent
+   * @param DashboardEvent<T> $dashboardEvent
    *
    * @throws \Exception
    */
-  public function dashboard(DashboardEvent $dashboardEvent)
+  public function dashboard(DashboardEvent $dashboardEvent): void
   {
-    $modules = $this->container->get('austral.admin.modules');
 
-    if($modules->getModuleByKey("admin-user")->isGranted("create"))
+    $moduleAdminUser = $this->modules->getModuleByKey("admin-user");
+    if($moduleAdminUser && $moduleAdminUser->isGranted("create"))
     {
       $dashboardActionAdminUser = new DashboardValues\Action("austral_action_admin_user");
       $dashboardActionAdminUser->setEntitled("actions.create")
         ->setPosition(100)
-        ->setPicto($modules->getModuleByKey("admin-user")->getPicto())
+        ->setPicto($moduleAdminUser->getPicto())
         ->setIsTranslatableText(true)
-        ->setUrl($modules->getModuleByKey("admin-user")->generateUrl("create"))
+        ->setUrl($moduleAdminUser->generateUrl("create"))
         ->setTranslateParameters(array(
-            "module_gender" =>  $modules->getModuleByKey("admin-user")->translateGenre(),
-            "module_name"   =>  $modules->getModuleByKey("admin-user")->translateSingular()
+            "module_gender" =>  $moduleAdminUser->translateGenre(),
+            "module_name"   =>  $moduleAdminUser->translateSingular()
           )
         );
-
-      $dashboardEvent->getDashboardBlock()->getChild("austral_actions")
-        ->addValue($dashboardActionAdminUser);
+      $dashboardEvent->getDashboardBlock()->getChild("austral_actions")?->addValue($dashboardActionAdminUser);
     }
 
-    if($modules->getModuleByKey("user")->isGranted("create"))
+    $moduleUser = $this->modules->getModuleByKey("admin-user");
+    if($moduleUser && $moduleUser->isGranted("create"))
     {
       $dashboardActionUser = new DashboardValues\Action("austral_action_user");
       $dashboardActionUser->setEntitled("actions.create")
         ->setPosition(100)
-        ->setPicto($modules->getModuleByKey("user")->getPicto())
+        ->setPicto($moduleUser->getPicto())
         ->setIsTranslatableText(true)
-        ->setUrl($modules->getModuleByKey("user")->generateUrl("create"))
+        ->setUrl($moduleUser->generateUrl("create"))
         ->setTranslateParameters(array(
-            "module_gender" =>  $modules->getModuleByKey("user")->translateGenre(),
-            "module_name"   =>  $modules->getModuleByKey("user")->translateSingular()
+            "module_gender" =>  $moduleUser->translateGenre(),
+            "module_name"   =>  $moduleUser->translateSingular()
           )
         );
-
-      $dashboardEvent->getDashboardBlock()->getChild("austral_actions")
-        ->addValue($dashboardActionUser);
+      $dashboardEvent->getDashboardBlock()->getChild("austral_actions")?->addValue($dashboardActionUser);
     }
 
   }

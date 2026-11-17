@@ -10,61 +10,66 @@
 
 namespace Austral\SecurityBundle\Repository\Base;
 
+use Austral\EntityBundle\ORM\AustralQueryBuilder;
 use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
 
 use Austral\EntityBundle\Repository\EntityRepository;
-use Austral\EntityBundle\Repository\EntityRepositoryInterface;
 
-use Austral\ToolsBundle\AustralTools;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * Austral Base User Repository.
+ * @template T of object
+ *
+ * @extends EntityRepository<T>
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @abstract
  */
-abstract class BaseUserEntityRepository extends EntityRepository implements EntityRepositoryInterface, UserLoaderInterface, PasswordUpgraderInterface
+abstract class BaseUserEntityRepository extends EntityRepository implements UserLoaderInterface, PasswordUpgraderInterface
 {
 
   /**
    * @param string $username
-   * @param \Closure|null $closure
+   * @param \Closure(object): mixed|null $closure
    *
-   * @return UserInterface|null
+   * @return UserInterface<T>|null
    * @throws NonUniqueResultException
    */
-  public function retreiveByUsername(string $username, \Closure $closure = null): ?UserInterface
+  public function retrieveByUsername(string $username, ?\Closure $closure = null): ?UserInterface
   {
-    return $this->retreiveByKey("username", $username, $closure);
+    /** @var UserInterface<T> $object */
+    $object =  $this->retrieveByKey("username", $username, $closure);
+    return $object;
   }
 
   /**
-   * @param string $email
-   * @param \Closure|null $closure
+   * @param string $username
+   * @param \Closure(object): mixed|null $closure
    *
-   * @return UserInterface|null
+   * @return UserInterface<T>|null
    * @throws NonUniqueResultException
    */
-  public function retreiveByEmail(string $email, \Closure $closure = null): ?UserInterface
+  public function retrieveByEmail(string $username, ?\Closure $closure = null): ?UserInterface
   {
-    return $this->retreiveByKey("email", $email, $closure);
+    /** @var UserInterface<T> $object */
+    $object =  $this->retrieveByKey("email", $username, $closure);
+    return $object;
   }
 
   /**
    * @param $name
-   * @param QueryBuilder $queryBuilder
+   * @param AustralQueryBuilder<T> $queryBuilder
    *
-   * @return QueryBuilder
+   * @return AustralQueryBuilder<T>
    */
-  public function queryBuilderExtends($name, QueryBuilder $queryBuilder): QueryBuilder
+  public function queryBuilderExtends($name, AustralQueryBuilder $queryBuilder): AustralQueryBuilder
   {
-    if($name == "retreive-by-key")
+    if($name == "retrieve-by-key")
     {
       $queryBuilder->leftJoin("root.groups", "groups")->addSelect("groups")
         ->leftJoin("root.securityRoles", "securityRoles")->addSelect("securityRoles");
@@ -73,46 +78,39 @@ abstract class BaseUserEntityRepository extends EntityRepository implements Enti
   }
 
   /**
-   * @throws NonUniqueResultException
-   * @deprecated since Symfony 5.3
-   */
-  public function loadUserByUsername(string $usernameOrEmail): ?UserInterface
-  {
-    return $this->loadUserByIdentifier($usernameOrEmail);
-  }
-
-  /**
    * loadUserByIdentifier
    *
-   * @param string $usernameOrEmail
+   * @param string $identifier
    *
-   * @return UserInterface|null
+   * @return UserInterface<T>|null
    * @throws NonUniqueResultException
    */
-  public function loadUserByIdentifier(string $usernameOrEmail): ?UserInterface
+  public function loadUserByIdentifier(string $identifier): ?UserInterface
   {
-    return $this->retreiveByLogin($usernameOrEmail);
+    return $this->retrieveByLogin($identifier);
   }
 
   /**
    * @param string $login
    *
-   * @return UserInterface|null
+   * @return UserInterface<T>|null
    * @throws NonUniqueResultException
    */
-  public function retreiveByLogin(string $login): ?UserInterface
+  public function retrieveByLogin(string $login): ?UserInterface
   {
-    $queryBuilder = $this->createQueryBuilder('root')
-      ->leftJoin("root.groups", "groups")->addSelect("groups")
-      ->leftJoin("root.securityRoles", "securityRoles")->addSelect("securityRoles")
-      ->where("root.email = :email OR root.username = :username")
-      ->setParameter("email", $login)
-      ->setParameter("username", $login)
-      ->setMaxResults(1);
-    $paginator = new Paginator($queryBuilder->getQuery(), false);
     try {
-      $object = AustralTools::first($paginator->getIterator()->getArrayCopy());
-    } catch (NoResultException $e) {
+      $queryBuilder = $this->createQueryBuilder('root')
+        ->leftJoin("root.groups", "groups")->addSelect("groups")
+        ->leftJoin("root.securityRoles", "securityRoles")->addSelect("securityRoles")
+        ->where("root.email = :email OR root.username = :username")
+        ->setParameter("email", $login)
+        ->setParameter("username", $login)
+        ->setMaxResults(1);
+
+      $paginatorResult = $this->paginatorByQueryBuilder($queryBuilder);
+      /** @var UserInterface<T> $object */
+      $object = $paginatorResult->first();
+    } catch (NoResultException|\Exception $e) {
       $object = null;
     }
     return $object;
@@ -128,11 +126,12 @@ abstract class BaseUserEntityRepository extends EntityRepository implements Enti
    */
   public function upgradePassword(UserInterface|\Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface $user, string $newHashedPassword): void
   {
-    // set the new hashed password on the User object
-    $user->setPassword($newHashedPassword);
-
-    // execute the queries on the database
-    $this->getEntityManager()->flush();
+    if($user instanceof UserInterface)
+    {
+      // set the new hashed password on the User object
+      $user->setPassword($newHashedPassword);
+      $this->getEntityManager()->flush();
+    }
   }
 
 }

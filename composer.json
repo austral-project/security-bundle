@@ -1,37 +1,46 @@
 {
-  "name":                                     "austral/security-bundle",
-  "type":                                     "symfony-bundle",
-  "description":                              "Austral users, roles and user groups",
-  "keywords":                                 ["Austral", "User", "Security"],
-  "license":                                  "MIT",
-  "homepage":                                 "https://austral.dev",
-  "authors": [
-    {
-      "name":                                 "Matthieu Beurel",
-      "email":                                "matthieu@austral.dev",
-      "role":                                 "Developer"
-    }
-  ],
-  "require": {
-    "php":                                    "^8.0 || ^8.1 || ^8.2",
-    "ext-sodium":                             "*",
-
-    "austral/tools-bundle":                   "^3.1",
-    "austral/entity-file-bundle":             "^3.1",
-    "austral/entity-bundle":                  "^3.1",
-
-    "symfony/console":                        "^5.4 || ^6.4",
-    "symfony/security-bundle":                "^5.4 || ^6.4",
-    "symfony/framework-bundle":               "^5.4 || ^6.4",
-    "symfony/yaml":                           "^5.4 || ^6.4"
-  },
-  "require-dev": {
-  },
-  "config": {
-    "sort-packages":                          true
-  },
-  "autoload": {
-    "psr-4": { "Austral\\SecurityBundle\\": "" }
-  },
-  "minimum-stability":                        "dev"
+    "name": "austral/security-bundle",
+    "type": "symfony-bundle",
+    "description": "Austral users, roles and user groups",
+    "keywords": [
+        "Austral",
+        "User",
+        "Security"
+    ],
+    "license": "MIT",
+    "homepage": "https://austral.dev",
+    "authors": [
+        {
+            "name": "Matthieu Beurel",
+            "email": "matthieu@austral.dev",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.2 <9.0",
+        "austral/contracts": "^4.0",
+        "ext-sodium": "*",
+        "austral/tools-bundle": "^4.0",
+        "austral/entity-file-bundle": "^4.0",
+        "austral/entity-bundle": "^4.0",
+        "symfony/console": "^7.4",
+        "symfony/security-bundle": "^7.4",
+        "symfony/framework-bundle": "^7.4",
+        "symfony/yaml": "^7.4"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "phpstan/phpstan": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "Austral\\SecurityBundle\\": ""
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

@@ -15,7 +15,6 @@ use Austral\SecurityBundle\Entity\Interfaces\RoleInterface;
 use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
 
 use Austral\EntityBundle\Entity\Entity;
-use Austral\EntityBundle\Entity\EntityInterface;
 use Austral\EntityBundle\Entity\Traits as Traits;
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,49 +24,60 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * Austral Group Entity.
+ * @template T of object
+ *
+ * @extends Entity<T>
+ * @implements GroupInterface<T>
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @abstract
- * @ORM\MappedSuperclass
  */
-abstract class Group extends Entity implements GroupInterface, EntityInterface
+#[ORM\MappedSuperclass]
+abstract class Group extends Entity implements GroupInterface
 {
   use Traits\EntityTimestampableTrait;
 
   /**
    * @var string
-   * @ORM\Column(name="id", type="string", length=40)
-   * @ORM\Id
    */
-  protected $id;
+  #[Orm\Column(name: 'id', type: 'string', length: 40)]
+  #[ORM\Id()]
+  protected string $id;
 
   /**
-   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\UserInterface", mappedBy="groups", cascade={"persist"})
+   * @var Collection<int|string, UserInterface<T>>
    */
+  #[ORM\ManyToMany(targetEntity: UserInterface::class, mappedBy: 'groups', cascade: ['persist'])]
   protected Collection $users;
 
   /**
-   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\RoleInterface", inversedBy="groups", cascade={"persist"})
-   * @ORM\JoinTable(name="austral_security_role_group",
-   *   joinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")},
-   *   inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
-   * )
+   * @var Collection<int|string, RoleInterface<T>>
    */
+  #[Orm\ManyToMany(targetEntity: RoleInterface::class, inversedBy: "groups", cascade: ["persist"])]
+  #[Orm\JoinTable(name: "austral_security_role_group",
+    joinColumns: [
+      new Orm\JoinColumn(name: "group_id", referencedColumnName: "id", onDelete: "CASCADE")
+    ],
+    inverseJoinColumns: [
+      new Orm\JoinColumn(name: "role_id", referencedColumnName: "id", onDelete: "CASCADE")
+    ]
+  )]
   protected Collection $roles;
 
   /**
-   * @var string|null
-   * @ORM\Column(name="name", type="string", length=255, nullable=false)
+   * @var string
    */
-  protected ?string $name = null;
+  #[ORM\Column(name: 'name', type: 'string', length: 255, nullable: false)]
+  protected string $name = "";
 
   /**
-   * @var string|null
-   * @ORM\Column(name="keyname", type="string", length=255, nullable=false)
+   * @var string
    */
-  protected ?string $keyname = null;
+  #[ORM\Column(name: 'keyname', type: 'string', length: 255, nullable: false)]
+  protected string $keyname = "";
 
   /**
-   * @return string
+   * @inheritDoc
    */
   public function __toString()
   {
@@ -87,7 +97,7 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   }
 
   /**
-   * @return array
+   * @return array<string, mixed>
    */
   public function arrayObject(): array
   {
@@ -99,10 +109,7 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   }
 
   /**
-   * Add user
-   *
-   * @param UserInterface $user
-   * @return $this
+   * @inheritDoc
    */
   public function addUser(UserInterface $user): Group
   {
@@ -115,11 +122,7 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   }
 
   /**
-   * Remove users
-   *
-   * @param UserInterface $user
-   *
-   * @return $this
+   * @inheritDoc
    */
   public function removeUser(UserInterface $user): Group
   {
@@ -132,8 +135,7 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   }
 
   /**
-   * Get users
-   * @return Collection
+   * @inheritDoc
    */
   public function getUsers(): Collection
   {
@@ -141,10 +143,7 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   }
 
   /**
-   * Add role
-   *
-   * @param RoleInterface $role
-   * @return $this
+   * @inheritDoc
    */
   public function addRole(RoleInterface $role): Group
   {
@@ -156,11 +155,7 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   }
 
   /**
-   * Remove role
-   *
-   * @param RoleInterface $role
-   *
-   * @return $this
+   * @inheritDoc
    */
   public function removeRole(RoleInterface $role): Group
   {
@@ -172,8 +167,7 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   }
 
   /**
-   * Get role
-   * @return Collection
+   * @inheritDoc
    */
   public function getRoles(): Collection
   {
@@ -181,14 +175,12 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   }
 
   /**
-   * getRolesArray
-   *
-   * @return array
+   * @inheritDoc
    */
   public function getRolesArray(): array
   {
     $groupRoles = array();
-    /** @var RoleInterface $role */
+    /** @var RoleInterface<T> $role */
     foreach($this->getRoles() as $role)
     {
       if(!in_array($role->getRole(), $groupRoles))
@@ -200,10 +192,7 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   }
 
   /**
-   * Set name
-   *
-   * @param string $name
-   * @return $this
+   * @inheritDoc
    */
   public function setName(string $name): Group
   {
@@ -212,30 +201,24 @@ abstract class Group extends Entity implements GroupInterface, EntityInterface
   }
 
   /**
-   * Get name
-   *
-   * @return string|null
+   * @inheritDoc
    */
-  public function getName(): ?string
+  public function getName(): string
   {
     return $this->name;
   }
 
   /**
-   * Get keyname
-   * @return string|null
+   * @inheritDoc
    */
-  public function getKeyname(): ?string
+  public function getKeyname(): string
   {
     return $this->keyname;
   }
 
-  /**
-   * @param string|null $keyname
-   *
-   * @return $this
+  /*** @inheritDoc
    */
-  public function setKeyname(string $keyname = null): Group
+  public function setKeyname(string $keyname): Group
   {
     $this->keyname = $keyname ? $this->keynameGenerator($keyname) : $this->keynameGenerator($this->name);
     return $this;

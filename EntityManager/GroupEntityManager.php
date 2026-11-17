@@ -13,50 +13,54 @@ namespace Austral\SecurityBundle\EntityManager;
 use Austral\SecurityBundle\Entity\Interfaces\GroupInterface;
 use Austral\SecurityBundle\Repository\GroupRepository;
 
-use Austral\EntityBundle\Entity\EntityInterface;
 use Austral\EntityBundle\EntityManager\EntityManager;
-use Austral\EntityBundle\EntityManager\EntityManagerInterface;
 
 /**
  * Austral Group Manager.
+ * @template T of object
+ *
+ * @extends EntityManager<T>
  *
  * @author Matthieu Beurel <matthieu@austral.dev>
  *
  * @final
  */
-class GroupEntityManager extends EntityManager implements EntityManagerInterface
+class GroupEntityManager extends EntityManager
 {
 
   /**
-   * @var GroupRepository
+   * @param class-string<T>|null $entity
+   * @return GroupRepository<T>|null
    */
-  protected $repository;
+  public function getRepository(?string $entity = null): ?GroupRepository
+  {
+    /** @var GroupRepository<T>|null $repository */
+    $repository = $this->repository;
+    return $repository;
+  }
 
   /**
-   * @param array $values
+   * @param array<string, mixed> $values
    *
-   * @return GroupInterface|EntityInterface
+   * @return GroupInterface<T>
    */
   public function create(array $values = array()): GroupInterface
   {
-    $class = $this->getClass();
-    /** @var GroupInterface|EntityInterface $object */
-    $object = new $class;
-    $object->hydrate($values);
+    /** @var GroupInterface<T> $object */
+    $object = parent::create($values);
     return $object;
   }
 
   /**
    * @param string $keyname
-   * @param \Closure|null $closure
+   * @param \Closure(object): mixed|null $closure
    *
-   * @return mixed
+   * @return GroupInterface<T>|null
    * @throws \Doctrine\ORM\NonUniqueResultException
    */
-  public function retreiveByKeyname(string $keyname, \Closure $closure = null): GroupInterface
+  public function retrieveByKeyname(string $keyname, ?\Closure $closure = null): ?GroupInterface
   {
-    return $this->repository->retreiveByKeyname($keyname, $closure);
+    return $this->getRepository()?->retrieveByKeyname($keyname, $closure) ?? null;
   }
-
 
 }

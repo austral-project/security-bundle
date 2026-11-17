@@ -11,15 +11,22 @@
 namespace Austral\SecurityBundle\EntityManager\Interfaces;
 
 use Austral\EntityBundle\EntityManager\EntityManagerInterface;
+use Austral\EntityBundle\EntityManager\EntityManagerORMInterface;
+use Austral\SecurityBundle\Entity\Interfaces\UserInterface as AustralUserInterface;
+use Doctrine\ORM\NonUniqueResultException;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Austral Interface User Manager.
+ * @template T of object
+ *
+ * @extends EntityManagerInterface<T>
+ * @extends EntityManagerORMInterface<T>
  *
  * @author Matthieu Beurel <matthieu@austral.dev>
  */
-interface UserEntityManagerInterface extends EntityManagerInterface
+interface UserEntityManagerInterface extends EntityManagerInterface, EntityManagerORMInterface
 {
 
   /**
@@ -27,7 +34,7 @@ interface UserEntityManagerInterface extends EntityManagerInterface
   *
   * @return $this
   */
-  public function setPasswordHasherFactory(PasswordHasherFactoryInterface $passwordHasherFactory): UserEntityManagerInterface;
+  public function setPasswordHasherFactory(PasswordHasherFactoryInterface $passwordHasherFactory): self;
 
   /**
    * Updates a user.
@@ -36,32 +43,28 @@ interface UserEntityManagerInterface extends EntityManagerInterface
    *
    * @return $this
    */
-  public function updateUser(UserInterface $user): UserEntityManagerInterface;
+  public function updateUser(UserInterface $user): self;
 
   /**
-   * Updates a user password if a plain password is set.
-   *
    * @param UserInterface $user
    *
    * @return $this
    */
-  public function updatePassword(UserInterface $user): UserEntityManagerInterface;
+  public function updatePassword(UserInterface $user): self;
 
   /**
-   * Retreive User with the email
-   *
    * @param string $email
    *
-   * @return mixed
+   * @return AustralUserInterface<T>|null
+   * @throws NonUniqueResultException
    */
-  public function retreiveByEmail(string $email);
+  public function retrieveByEmail(string $email): ?AustralUserInterface;
 
   /**
-   * Retreive User with the login
-   *
    * @param string $login
    *
-   * @return mixed
+   * @return AustralUserInterface<T>|null
+   * @throws NonUniqueResultException
    */
-  public function retreiveByLogin(string $login);
+  public function retrieveByLogin(string $login): ?AustralUserInterface;
 }

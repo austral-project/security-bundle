@@ -36,7 +36,7 @@ class MigratePasswordHasher implements PasswordHasherInterface
    *
    * @return string
    */
-  public function hash(string $plainPassword, string $salt = null): string
+  public function hash(string $plainPassword, ?string $salt = null): string
   {
     if ($this->isPasswordTooLong($plainPassword)) {
       throw new InvalidPasswordException();
@@ -54,7 +54,7 @@ class MigratePasswordHasher implements PasswordHasherInterface
    *
    * @return bool
    */
-  public function verify(string $hashedPassword, string $plainPassword, string $salt = null): bool
+  public function verify(string $hashedPassword, string $plainPassword, ?string $salt = null): bool
   {
     return password_verify($this->mergePasswordAndSalt($plainPassword, $salt), $hashedPassword);
   }

@@ -17,22 +17,28 @@ use Doctrine\ORM\NonUniqueResultException;
 
 /**
  * Austral Group Repository.
+ * @template T of object
+ *
+ * @extends EntityRepository<T>
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @final
  */
-class GroupRepository extends EntityRepository implements EntityRepositoryInterface
+class GroupRepository extends EntityRepository
 {
 
   /**
    * @param string $keyname
-   * @param \Closure|null $closure
+   * @param \Closure(object): mixed|null $closure
    *
-   * @return GroupInterface|null
+   * @return GroupInterface<T>|null
    * @throws NonUniqueResultException
    */
-  public function retreiveByKeyname(string $keyname, \Closure $closure = null): ?GroupInterface
+  public function retrieveByKeyname(string $keyname, ?\Closure $closure = null): ?GroupInterface
   {
-    return $this->retreiveByKey("keyname", $keyname, $closure);
+    /** @var GroupInterface<T> $object */
+    $object =  $this->retrieveByKey("keyname", $keyname, $closure);
+    return $object;
   }
 
 }

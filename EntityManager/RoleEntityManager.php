@@ -12,47 +12,54 @@ namespace Austral\SecurityBundle\EntityManager;
 
 use Austral\SecurityBundle\Entity\Interfaces\RoleInterface;
 use Austral\SecurityBundle\Repository\RoleRepository;
-use Austral\EntityBundle\Entity\EntityInterface;
 use Austral\EntityBundle\EntityManager\EntityManager;
-use Austral\EntityBundle\EntityManager\EntityManagerInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Query\QueryException;
 
 /**
  * Austral Role Manager.
+ * @template T of RoleInterface
+ *
+ * @extends EntityManager<T>>
  *
  * @author Matthieu Beurel <matthieu@austral.dev>
  *
  * @final
  */
-class RoleEntityManager extends EntityManager implements EntityManagerInterface
+class RoleEntityManager extends EntityManager
 {
 
   /**
-   * @var RoleRepository
+   * @param class-string<T>|null $entity
+   * @return RoleRepository<T>|null
    */
-  protected $repository;
+  public function getRepository(?string $entity = null): ?RoleRepository
+  {
+    /** @var RoleRepository<T>|null $repository */
+    $repository = $this->repository;
+    return $repository;
+  }
 
   /**
-   * @param array $values
+   * @param array<string, mixed> $values
    *
-   * @return RoleInterface|EntityInterface
+   * @return RoleInterface<T>
    */
   public function create(array $values = array()): RoleInterface
   {
-    /** @var RoleInterface|EntityInterface $object */
+    /** @var RoleInterface<T> $object */
     $object = parent::create($values);
-    $object->hydrate($values);
     return $object;
   }
 
   /**
-   * @return array|ArrayCollection
+   * @return Collection<int, RoleInterface<T>>
    * @throws QueryException
    */
-  public function selectRoles()
+  public function selectRoles(): Collection
   {
-    return $this->repository->selectRoles();
+    return $this->getRepository()?->selectRoles() ?? new ArrayCollection();
   }
 
 }

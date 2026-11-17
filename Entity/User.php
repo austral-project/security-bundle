@@ -10,20 +10,17 @@
 
 namespace Austral\SecurityBundle\Entity;
 
-use Austral\EntityBundle\Entity\Interfaces\FileInterface;
+use Austral\EntityFileBundle\Entity\Interfaces\CropperInterface;
 use Austral\EntityFileBundle\Entity\Traits\EntityFileCropperTrait;
 use Austral\EntityFileBundle\Entity\Traits\EntityFileTrait;
 use Austral\SecurityBundle\Entity\Interfaces\GroupInterface;
 use Austral\SecurityBundle\Entity\Interfaces\RoleInterface;
 use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
-use Austral\EntityFileBundle\Annotation as AustralFile;
+use Austral\EntityFileBundle\Attribute as AustralFile;
 
 use Austral\EntityBundle\Entity\Entity;
-use Austral\EntityBundle\Entity\EntityInterface;
 use Austral\EntityBundle\Entity\Traits as Traits;
 
-
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -31,108 +28,122 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * Austral User Entity.
+ * @template T of object
+ *
+ * @extends Entity<T>
+ * @implements UserInterface<T>
+ * @implements CropperInterface<T>
+ * @use EntityFileTrait<T>
+ * @use EntityFileCropperTrait<T>
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @abstract
- * @ORM\MappedSuperclass
  */
-abstract class User extends Entity implements UserInterface, EntityInterface, FileInterface, PasswordAuthenticatedUserInterface
+#[ORM\MappedSuperclass]
+abstract class User extends Entity implements UserInterface, CropperInterface
 {
 
-  const USER_TYPE_ROOT = "root";
-  const USER_TYPE_ADMIN = "admin";
-  const USER_TYPE_USER = "user";
+  /** @use EntityFileTrait<T> */
+  use EntityFileTrait;
 
-  const USER_INTERFACE_AUTO = "auto";
-  const USER_INTERFACE_DARK = "dark";
-  const USER_INTERFACE_LIGHT = "light";
+  /** @use EntityFileCropperTrait<T> */
+  use EntityFileCropperTrait;
 
   use Traits\EntityTimestampableTrait;
-  use EntityFileTrait;
-  use EntityFileCropperTrait;
 
   /**
    * @var string
-   * @ORM\Column(name="id", type="string", length=40)
-   * @ORM\Id
    */
-  protected $id;
+  #[Orm\Column(name: 'id', type: 'string', length: 40)]
+  #[ORM\Id()]
+  protected string $id;
 
   /**
-   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\RoleInterface", inversedBy="users", cascade={"persist"})
-   * @ORM\JoinTable(name="austral_security_user_role",
-   *   joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-   *   inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id", onDelete="CASCADE")}
-   * )
+   * @var Collection<int|string, RoleInterface<T>>
    */
+  #[Orm\ManyToMany(targetEntity: RoleInterface::class, inversedBy: "users", cascade: ["persist"])]
+  #[Orm\JoinTable(name: "austral_security_user_role",
+    joinColumns: [
+      new Orm\JoinColumn(name: "user_id", referencedColumnName: "id", onDelete: "CASCADE")
+    ],
+    inverseJoinColumns: [
+      new Orm\JoinColumn(name: "role_id", referencedColumnName: "id", onDelete: "CASCADE")
+    ]
+  )]
   protected Collection $securityRoles;
 
   /**
-   * @ORM\ManyToMany(targetEntity="\Austral\SecurityBundle\Entity\Interfaces\GroupInterface", inversedBy="users", cascade={"persist"})
-   * @ORM\JoinTable(name="austral_security_user_group",
-   *   joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")},
-   *   inverseJoinColumns={@ORM\JoinColumn(name="group_id", referencedColumnName="id", onDelete="CASCADE")}
-   * )
+   * @var Collection<int|string, GroupInterface<T>>
    */
+  #[Orm\ManyToMany(targetEntity: GroupInterface::class, inversedBy: "users", cascade: ["persist"])]
+  #[Orm\JoinTable(name: "austral_security_user_group",
+    joinColumns: [
+      new Orm\JoinColumn(name: "user_id", referencedColumnName: "id", onDelete: "CASCADE")
+    ],
+    inverseJoinColumns: [
+      new Orm\JoinColumn(name: "role_id", referencedColumnName: "id", onDelete: "CASCADE")
+    ]
+  )]
   protected Collection $groups;
 
   /**
-   * @var string|null
-   * @ORM\Column(type="string", length=128, unique=true)
+   * @var string
    */
-  protected ?string $username = null;
+  #[ORM\Column(name: 'username', type: 'string', length: 255, unique: true, nullable: false)]
+  protected string $username = "";
+
+  /**
+   * @var string
+   */
+  #[ORM\Column(name: 'email', type: 'string', length: 255, unique: true, nullable: false)]
+  protected string $email = "";
 
   /**
    * @var string|null
-   * @ORM\Column(type="string", length=128, unique=true)
    */
-  protected ?string $email = null;
-
-  /**
-   * @var string|null
-   * @ORM\Column(name="firstname", type="string", length=64, nullable=true)
-   */
+  #[ORM\Column(name: 'firstname', type: 'string', length: 255, nullable: true)]
   protected ?string $firstname = null;
 
   /**
    * @var string|null
-   * @ORM\Column(name="lastname", type="string", length=64, nullable=true)
    */
+  #[ORM\Column(name: 'lastname', type: 'string', length: 255, nullable: true)]
   protected ?string $lastname = null;
 
   /**
    * @var string|null
-   * @ORM\Column(name="avatar", type="string", length=255, nullable=true)
-   * @AustralFile\UploadParameters(configName="avatar")
-   * @AustralFile\ImageSize()
-   * @AustralFile\Croppers({
-   *  "avatar",
-   * })
    */
+  #[ORM\Column(name: 'avatar', type: 'string', length: 255, nullable: true)]
+  #[AustralFile\UploadParameters(configName: "avatar")]
+  #[AustralFile\ImageSize()]
+  #[AustralFile\Croppers(croppers: [
+    new AustralFile\Cropper(name: "avatar")
+  ])]
   protected ?string $avatar = null;
 
   /**
    * @var string|null
-   * @ORM\Column(name="avatar_color", type="string", length=255, nullable=true )
    */
+  #[ORM\Column(name: 'avatar_color', type: 'string', length: 34, nullable: true)]
   protected ?string $avatarColor = null;
 
   /**
    * @var string|null
-   * @ORM\Column(name="language", type="string", length=255, nullable=true )
    */
+  #[ORM\Column(name: 'language', type: 'string', length: 4, nullable: true)]
   protected ?string $language = null;
 
   /**
-   * @var string|null
-   * @ORM\Column(name="password", type="string", length=255)
+   * @var string
    */
-  protected ?string $password = null;
+  #[ORM\Column(name: 'password', type: 'string', length: 255)]
+  protected string $password = "";
 
   /**
-   * @var string|null
-   * @ORM\Column(name="salt", type="string", length=255)
+   * @var string
    */
-  protected ?string $salt = null;
+  #[ORM\Column(name: 'salt', type: 'string', length: 255)]
+  protected string $salt = "";
 
   /**
    * @var string|null
@@ -143,24 +154,26 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
    * @var boolean
    * @ORM\Column(name="is_active", type="boolean")
    */
+  #[ORM\Column(name: 'is_active', type: 'boolean')]
   protected bool $isActive = false;
 
   /**
    * @var string|null
-   * @ORM\Column(name="forgot_password_token", type="text", nullable=true )
    */
+  #[ORM\Column(name: 'forgot_password_token', type: 'text', nullable: true)]
   protected ?string $forgotPasswordToken = null;
   
   /**
    * @var string|null
-   * @ORM\Column(name="type_user", type="string", length=255, nullable=true )
    */
+  #[ORM\Column(name: 'type_user', type: 'string', length: 255, nullable: true)]
   protected ?string $typeUser = null;
 
   /**
    * @var string|null
    * @ORM\Column(name="interface_theme", type="string", length=255, nullable=true )
    */
+  #[ORM\Column(name: 'interface_theme', type: 'string', length: 255, nullable: true)]
   protected ?string $interfaceTheme = null;
 
   /**
@@ -169,14 +182,6 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   public function __toString()
   {
     return "{$this->lastname} {$this->firstname}";
-  }
-
-  /**
-   * @return array
-   */
-  public function getFieldsToDelete(): array
-  {
-    return array("avatar");
   }
 
   /**
@@ -194,7 +199,7 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * @return array
+   * @return array<string, mixed>
    */
   public function arrayObject(): array
   {
@@ -230,18 +235,21 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
     return $this->typeUser === self::USER_TYPE_USER;
   }
 
-  public function eraseCredentials()
+  /**
+   * Required by Symfony\Component\Security\Core\User\UserInterface until Symfony 8.
+   * Nothing to erase: the plain password is never serialized.
+   *
+   * @return void
+   */
+  #[\Deprecated]
+  public function eraseCredentials(): void
   {
-    // TODO: Implement eraseCredentials() method.
   }
 
   /**
-   * Add role
-   *
-   * @param RoleInterface $role
-   * @return $this
+   * @inheritDoc
    */
-  public function addSecurityRole(RoleInterface $role): User
+  public function addSecurityRole(RoleInterface $role): self
   {
     if(!$this->securityRoles->contains($role))
     {
@@ -252,13 +260,9 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Remove securityRole
-   *
-   * @param RoleInterface $role
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function removeSecurityRole(RoleInterface $role): User
+  public function removeSecurityRole(RoleInterface $role): self
   {
     if($this->securityRoles->contains($role))
     {
@@ -269,8 +273,7 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Get securityRoles
-   * @return Collection
+   * @inheritDoc
    */
   public function getSecurityRoles(): Collection
   {
@@ -278,7 +281,7 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * @return array
+   * @inheritDoc
    */
   public function getRoles(): array
   {
@@ -295,24 +298,20 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
     {
       $roles[] = "ROLE_USER_ACCESS";
     }
-    /** @var RoleInterface $securityRole */
+    /** @var RoleInterface<T> $securityRole */
     foreach($this->getSecurityRoles() as $securityRole)
     {
       $roles[] = $securityRole->getRole();
     }
-    /** @var GroupInterface $group */
+    /** @var GroupInterface<T> $group */
     foreach ($this->getGroups() as $group)
     {
-      /** @var ArrayCollection $groupRoles */
-      if($groupRoles = $group->getRoles())
+      /** @var RoleInterface<T> $role */
+      foreach($group->getRoles() as $role)
       {
-        /** @var RoleInterface $role */
-        foreach($groupRoles as $role)
+        if(!in_array($role->getRole(), $roles))
         {
-          if(!in_array($role->getRole(), $roles))
-          {
-            $roles[] = $role->getRole();
-          }
+          $roles[] = $role->getRole();
         }
       }
     }
@@ -320,12 +319,9 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Add group
-   *
-   * @param GroupInterface $group
-   * @return $this
+   * @inheritDoc
    */
-  public function addGroup(GroupInterface $group): User
+  public function addGroup(GroupInterface $group): self
   {
     if(!$this->groups->contains($group))
     {
@@ -336,13 +332,9 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Remove group
-   *
-   * @param GroupInterface $group
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function removeGroup(GroupInterface $group): User
+  public function removeGroup(GroupInterface $group): self
   {
     if($this->groups->contains($group))
     {
@@ -353,9 +345,7 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Get groups
-   *
-   * @return Collection
+   * @inheritDoc
    */
   public function getGroups(): Collection
   {
@@ -363,60 +353,51 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * @return string
+   * @inheritDoc
    */
   public function getUserIdentifier(): string
   {
-    return $this->username;
+    /** @var non-empty-string $userIdentifier */
+    $userIdentifier = $this->getUsername() !== "" ? $this->getUsername() : $this->getId();
+    return $userIdentifier;
   }
 
   /**
-   * Get username
-   * @return string|null
+   * @inheritDoc
    */
-  public function getUsername(): ?string
+  public function getUsername(): string
   {
     return $this->username;
   }
 
   /**
-   * Set username
-   *
-   * @param string $username
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setUsername(string $username): User
+  public function setUsername(string $username): self
   {
     $this->username = $username;
     return $this;
   }
 
   /**
-   * Get email
-   * @return string|null
+   * @inheritDoc
    */
-  public function getEmail(): ?string
+  public function getEmail(): string
   {
     return $this->email;
   }
 
   /**
-   * Set email
-   *
-   * @param string $email
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setEmail(string $email): User
+  public function setEmail(string $email): self
   {
     $this->email = $email;
     return $this;
   }
 
   /**
-   * Get firstname
-   * @return string|null
+   * @inheritDoc
    */
   public function getFirstname(): ?string
   {
@@ -424,21 +405,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set firstname
-   *
-   * @param string|null $firstname
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setFirstname(?string $firstname): User
+  public function setFirstname(?string $firstname): self
   {
     $this->firstname = $firstname;
     return $this;
   }
 
   /**
-   * Get lastname
-   * @return string
+   * @inheritDoc
    */
   public function getLastname(): ?string
   {
@@ -446,21 +422,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set lastname
-   *
-   * @param string|null $lastname
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setLastname(?string $lastname): User
+  public function setLastname(?string $lastname): self
   {
     $this->lastname = $lastname;
     return $this;
   }
 
   /**
-   * Get avatar
-   * @return string
+   * @inheritDoc
    */
   public function getAvatar(): ?string
   {
@@ -468,21 +439,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set avatar
-   *
-   * @param string|null $avatar
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setAvatar(?string $avatar): User
+  public function setAvatar(?string $avatar): self
   {
     $this->avatar = $avatar;
     return $this;
   }
 
   /**
-   * Get avatarColor
-   * @return string
+   * @inheritDoc
    */
   public function getAvatarColor(): ?string
   {
@@ -490,21 +456,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set avatarColor
-   *
-   * @param string|null $avatarColor
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setAvatarColor(?string $avatarColor): User
+  public function setAvatarColor(?string $avatarColor): self
   {
     $this->avatarColor = $avatarColor;
     return $this;
   }
 
   /**
-   * Get language
-   * @return string|null
+   * @inheritDoc
    */
   public function getLanguage(): ?string
   {
@@ -512,21 +473,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set language
-   *
-   * @param string|null $language
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setLanguage(?string $language): User
+  public function setLanguage(?string $language): self
   {
     $this->language = $language;
     return $this;
   }
 
   /**
-   * Get password
-   * @return string|null
+   * @inheritDoc
    */
   public function getPassword(): ?string
   {
@@ -534,21 +490,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set password
-   *
-   * @param string $password
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setPassword(string $password): User
+  public function setPassword(string $password): self
   {
     $this->password = $password;
     return $this;
   }
 
   /**
-   * Get salt
-   * @return string|null
+   * @inheritDoc
    */
   public function getSalt(): ?string
   {
@@ -556,21 +507,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set salt
-   *
-   * @param string $salt
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setSalt(string $salt): User
+  public function setSalt(string $salt): self
   {
     $this->salt = $salt;
     return $this;
   }
 
   /**
-   * Get plainPassword
-   * @return string
+   * @inheritDoc
    */
   public function getPlainPassword(): ?string
   {
@@ -578,21 +524,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set plainPassword
-   *
-   * @param string|null $plainPassword
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setPlainPassword(?string $plainPassword): User
+  public function setPlainPassword(?string $plainPassword): self
   {
     $this->plainPassword = $plainPassword;
     return $this;
   }
 
   /**
-   * Get isActive
-   * @return bool
+   * @inheritDoc
    */
   public function getIsActive(): bool
   {
@@ -600,21 +541,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set isActive
-   *
-   * @param bool $isActive
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setIsActive(bool $isActive): User
+  public function setIsActive(bool $isActive): self
   {
     $this->isActive = $isActive;
     return $this;
   }
 
   /**
-   * Get forgotPasswordToken
-   * @return string|null
+   * @inheritDoc
    */
   public function getForgotPasswordToken(): ?string
   {
@@ -622,21 +558,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set forgotPasswordToken
-   *
-   * @param string|null $forgotPasswordToken
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setForgotPasswordToken(?string $forgotPasswordToken): User
+  public function setForgotPasswordToken(?string $forgotPasswordToken): self
   {
     $this->forgotPasswordToken = $forgotPasswordToken;
     return $this;
   }
 
   /**
-   * Get typeUser
-   * @return string|null
+   * @inheritDoc
    */
   public function getTypeUser(): ?string
   {
@@ -644,20 +575,16 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * Set typeUser
-   *
-   * @param string|null $typeUser
-   *
-   * @return $this
+   * @inheritDoc
    */
-  public function setTypeUser(?string $typeUser): User
+  public function setTypeUser(?string $typeUser): self
   {
     $this->typeUser = $typeUser;
     return $this;
   }
 
   /**
-   * @return string|null
+   * @inheritDoc
    */
   public function getInterfaceTheme(): ?string
   {
@@ -665,11 +592,9 @@ abstract class User extends Entity implements UserInterface, EntityInterface, Fi
   }
 
   /**
-   * @param string|null $interfaceTheme
-   *
-   * @return User
+   * @inheritDoc
    */
-  public function setInterfaceTheme(?string $interfaceTheme): User
+  public function setInterfaceTheme(?string $interfaceTheme): self
   {
     $this->interfaceTheme = $interfaceTheme;
     return $this;

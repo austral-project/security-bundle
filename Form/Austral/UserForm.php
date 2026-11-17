@@ -10,25 +10,26 @@
 
 namespace Austral\SecurityBundle\Form\Austral;
 
-use App\Entity\Austral\SecurityBundle\Group;
-use App\Entity\Austral\SecurityBundle\Role;
-use App\Entity\Austral\SecurityBundle\User;
 use Austral\FormBundle\Mapper\Fieldset;
 use Austral\FormBundle\Mapper\FormMapper;
 use Austral\FormBundle\Mapper\GroupFields;
 use Austral\FormBundle\Field as Field;
+use Austral\SecurityBundle\Entity\Interfaces\GroupInterface;
+use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
 use Symfony\Component\Validator\Constraints as Constraints;
 use Doctrine\ORM\EntityRepository;
 
 /**
  * Austral UserForm.
+ * @template T of object
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  */
 class UserForm
 {
 
   /**
-   * @var FormMapper $formMapper
+   * @var FormMapper<T> $formMapper
    */
   protected FormMapper $formMapper;
 
@@ -42,6 +43,11 @@ class UserForm
    */
   protected ?string $formType = null;
 
+  /**
+   * @param FormMapper<T> $formMapper
+   * @param string|null $typeUserForm
+   * @param string|null $formType
+   */
   public function __construct(FormMapper $formMapper, ?string $typeUserForm = null, ?string $formType = "user")
   {
     $this->formMapper = $formMapper;
@@ -50,22 +56,30 @@ class UserForm
   }
 
   /**
+   * form
+   *
+   * @param array<string, string> $language
+   * @return void
+   * @throws \Random\RandomException
    * @throws \Exception
    */
-  public function form(array $language = array())
+  public function form(array $language = array()): void
   {
+    /** @var UserInterface<T>|null $object */
+    $object = $this->formMapper->getObject();
+
     if($this->formType == "admin")
     {
-      if($this->typeUserForm === User::USER_TYPE_ROOT)
+      if($this->typeUserForm === UserInterface::USER_TYPE_ROOT)
       {
         $typeUser = array(
-          "choices.user.type.root"    =>  User::USER_TYPE_ROOT,
-          "choices.user.type.admin"   =>  User::USER_TYPE_ADMIN
+          "choices.user.type.root"    =>  UserInterface::USER_TYPE_ROOT,
+          "choices.user.type.admin"   =>  UserInterface::USER_TYPE_ADMIN
         );
       }
       else {
         $typeUser = array(
-          "choices.user.type.admin"   =>  User::USER_TYPE_ADMIN,
+          "choices.user.type.admin"   =>  UserInterface::USER_TYPE_ADMIN,
         );
       }
       $this->formMapper->addFieldset("fieldset.right")
@@ -73,8 +87,6 @@ class UserForm
         ->setViewName(false)
         ->add(Field\SelectField::create("typeUser", $typeUser));
     }
-
-
 
     $this->formMapper->addFieldset("fieldset.right")
       ->setPositionName(Fieldset::POSITION_RIGHT)
@@ -88,8 +100,9 @@ class UserForm
           array("required"=>true)
         )
       )
-      ->end()
-      ->addFieldset("fieldset.generalInformation")
+      ->end();
+
+      $this->formMapper->addFieldset("fieldset.generalInformation")
         ->addGroup("name")
           ->add(Field\TextField::create("lastname", array(
               "group"     =>  array(
@@ -108,17 +121,20 @@ class UserForm
         ->add(Field\ColorPicker::create("avatarColor", array(
           "colorpicker-options"  =>  array()
         )))
-      ->end()
-      ->addFieldset("fieldset.connexionInformation")
+      ->end();
+
+      $this->formMapper->addFieldset("fieldset.connexionInformation")
         ->add(Field\TextField::create("username"))
         ->add(Field\TextField::create("email"))
-        ->add(Field\PasswordField::create("plainPassword")->setConstraints(!$this->formMapper->getObject()->getPassword() ? array(new Constraints\NotNull()) : array()))
+        ->add(Field\PasswordField::create("plainPassword")
+          ->setConstraints(!$object?->getPassword() ? array(new Constraints\NotNull()) : array())
+        )
       ->end();
 
     if($this->formType == "admin")
     {
       $this->formMapper->addFieldset("fieldset.permissions")
-        ->add(Field\EntityField::create("groups", Group::class, array(
+        ->add(Field\EntityField::create("groups", GroupInterface::class, array(
               "multiple"          =>  true,
               'query_builder'     => function (EntityRepository $er) {
                 return $er->createQueryBuilder('u')->orderBy('u.name', 'ASC');
@@ -127,10 +143,10 @@ class UserForm
           )
         )
         ->end();
-        if($this->typeUserForm === User::USER_TYPE_ROOT)
+        if($this->typeUserForm === UserInterface::USER_TYPE_ROOT)
         {
           $this->formMapper->addFieldset("fieldset.permissions")
-            ->add(Field\EntityField::create("securityRoles", Role::class, array(
+            ->add(Field\EntityField::create("securityRoles", GroupInterface::class, array(
                 "multiple"          =>  true,
                 'query_builder'     => function (EntityRepository $er) {
                   return $er->createQueryBuilder('u')->orderBy('u.name', 'ASC');

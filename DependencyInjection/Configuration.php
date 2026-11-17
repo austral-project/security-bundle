@@ -25,7 +25,6 @@ class Configuration implements ConfigurationInterface
    */
   public function getConfigTreeBuilder(): TreeBuilder
   {
-    $treeBuilder = new TreeBuilder('austral_security');
-    return $treeBuilder;
+    return new TreeBuilder('austral_security');
   }
 }

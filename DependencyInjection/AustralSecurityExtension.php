@@ -45,20 +45,24 @@ class AustralSecurityExtension extends Extension
    */
   protected function loadConfigToAustralManagerBundle(ContainerBuilder $container, YamlFileLoader $loader): void
   {
-    $bundlesConfigPath = $container->getParameter("kernel.project_dir")."/config/bundles.php";
-    if(file_exists($bundlesConfigPath))
+    $projectDir = $container->getParameter("kernel.project_dir");
+    if($projectDir && is_string($projectDir))
     {
-      $contents = require $bundlesConfigPath;
-      if(array_key_exists("Austral\AdminBundle\AustralAdminBundle", $contents))
+      $bundlesConfigPath = $projectDir."/config/bundles.php";
+      if(file_exists($bundlesConfigPath))
       {
-        $loader->load('austral_admin.yaml');
-      }
-      $contents = require $bundlesConfigPath;
-      if(array_key_exists("Austral\EntityFileBundle\AustralEntityFileBundle", $contents))
-      {
-        $loader->load('austral_entity_file.yaml');
+        $contents = require $bundlesConfigPath;
+        if(array_key_exists("Austral\AdminBundle\AustralAdminBundle", $contents))
+        {
+          $loader->load('austral_admin.yaml');
+        }
+        if(array_key_exists("Austral\EntityFileBundle\AustralEntityFileBundle", $contents))
+        {
+          $loader->load('austral_entity_file.yaml');
+        }
       }
     }
+
   }
 
 }

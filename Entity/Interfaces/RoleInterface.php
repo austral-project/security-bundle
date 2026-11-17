@@ -10,60 +10,58 @@
 
 namespace Austral\SecurityBundle\Entity\Interfaces;
 
+use Austral\Contracts\Entity\EntityInterface;
 use Doctrine\Common\Collections\Collection;
 
 /**
  * Austral Interface Role.
+ * @template T of object
+ *
+ * @extends EntityInterface<T>
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  */
-interface RoleInterface
+interface RoleInterface extends EntityInterface
 {
 
   /**
-   * Add user
-   *
-   * @param UserInterface $user
+   * @param UserInterface<T> $user
    * @return $this
    */
-  public function addUser(UserInterface $user): RoleInterface;
+  public function addUser(UserInterface $user): self;
 
   /**
-   * Remove users
-   *
-   * @param UserInterface $user
+   * @param UserInterface<T> $user
    *
    * @return $this
    */
-  public function removeUser(UserInterface $user): RoleInterface;
+  public function removeUser(UserInterface $user): self;
 
   /**
-   * Get users
-   *
-   * @return Collection
+   * @return Collection<int|string, UserInterface<T>>
    */
   public function getUsers(): Collection;
 
   /**
-   * Add group
+   * @param GroupInterface<T> $group
    *
-   * @param GroupInterface $group
    * @return $this
    */
-  public function addGroup(GroupInterface $group): RoleInterface;
+  public function addGroup(GroupInterface $group): self;
 
   /**
    * Remove group
    *
-   * @param GroupInterface $group
+   * @param GroupInterface<T> $group
    *
    * @return $this
    */
-  public function removeGroup(GroupInterface $group): RoleInterface;
+  public function removeGroup(GroupInterface $group): self;
 
   /**
    * Get groups
    *
-   * @return Collection
+   * @return Collection<int|string, GroupInterface<T>>
    */
   public function getGroups(): Collection;
 
@@ -74,14 +72,14 @@ interface RoleInterface
    *
    * @return $this
    */
-  public function setName(string $name): RoleInterface;
+  public function setName(string $name): self;
 
   /**
    * Get name
    *
-   * @return string|null
+   * @return string
    */
-  public function getName(): ?string;
+  public function getName(): string;
 
   /**
    * Set role
@@ -90,13 +88,13 @@ interface RoleInterface
    *
    * @return $this
    */
-  public function setRole(string $role): RoleInterface;
+  public function setRole(string $role): self;
 
   /**
    * Get role
    *
-   * @return string|null
+   * @return string
    */
-  public function getRole(): ?string;
+  public function getRole(): string;
 
 }

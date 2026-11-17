@@ -11,7 +11,7 @@
 namespace Austral\SecurityBundle\Command;
 
 use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
-use Austral\SecurityBundle\Entity\User as UserAlias;
+use Austral\SecurityBundle\Entity\User;
 use Austral\SecurityBundle\EntityManager\UserEntityManager;
 
 use Austral\ToolsBundle\Command\Base\Command;
@@ -19,14 +19,15 @@ use Austral\ToolsBundle\Command\Exception\CommandException;
 
 
 use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Austral User Command.
+ * @template T of object
+ *
  * @author Matthieu Beurel <matthieu@austral.dev>
  * @final
  */
@@ -46,7 +47,7 @@ class UserCommand extends Command
   /**
    * {@inheritdoc}
    */
-  protected function configure()
+  protected function configure(): void
   {
     $this
       ->setDefinition([
@@ -73,15 +74,27 @@ EOF
   }
 
   /**
+   * @param UserEntityManager<T> $userEntityManager
+   * @param string|null $name
+   * @param (callable(): mixed)|null $code
+   */
+  public function __construct(
+    #[Autowire(service: 'austral.entity_manager.user')] protected UserEntityManager $userEntityManager,
+    ?string $name = null,
+    ?callable $code = null)
+  {
+    parent::__construct($name, $code);
+  }
+
+  /**
    * @param InputInterface $input
    * @param OutputInterface $output
    *
    * @return void
    * @throws CommandException
    * @throws NonUniqueResultException
-   * @throws ORMException
    */
-  protected function executeCommand(InputInterface $input, OutputInterface $output)
+  protected function executeCommand(InputInterface $input, OutputInterface $output): void
   {
     $createUser = $input->getOption("create");
     if(!$email = $input->getOption('email'))
@@ -94,11 +107,8 @@ EOF
     }
     $username = $input->getOption('username') ? : $email;
 
-    /** @var UserEntityManager $userManager */
-    $userManager = $this->container->get('austral.entity_manager.user');
-
-    /** @var UserInterface $user */
-    $user = $userManager->retreiveByEmail($email);
+    /** @var UserInterface<T>|null $user */
+    $user = $this->userEntityManager->retrieveByEmail($email);
     if($createUser && $user)
     {
       if(!$input->getOption("if-not-exist"))
@@ -117,8 +127,8 @@ EOF
     }
     else
     {
-      /** @var UserInterface $user */
-      $user = $userManager->create(array(
+      /** @var UserInterface<T> $user */
+      $user = $this->userEntityManager->create(array(
           "username"        =>  $username,
           "email"           =>  $email,
           "plainPassword"   =>  $password,
@@ -129,7 +139,7 @@ EOF
     }
     if($input->getOption('root'))
     {
-      $user->setTypeUser(UserAlias::USER_TYPE_ROOT);
+      $user->setTypeUser(UserInterface::USER_TYPE_ROOT);
     }
 
     if($input->getOption('disabled'))
@@ -142,7 +152,7 @@ EOF
     }
 
     $this->viewMessage("User {$email} is ".($createUser ? "created" : "updated")." successfully !!!", "success");
-    $userManager->updateUser($user);
+    $this->userEntityManager->updateUser($user);
   }
 
 
