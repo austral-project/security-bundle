@@ -14,14 +14,24 @@ $finder = (new PhpCsFixer\Finder())
     ->ignoreVCS(true);
 
 return (new PhpCsFixer\Config())
-    ->setRiskyAllowed(true)
+    // Austral code style: 2-space indentation (same as .editorconfig)
+    ->setIndent('  ')
+    ->setLineEnding("\n")
+    // Risky rules (strict_types, strict in_array, base64_decode strict...) change runtime
+    // behaviour: they stay off until each bundle has been reviewed and covered by tests.
+    ->setRiskyAllowed(false)
     ->setRules([
         '@Symfony' => true,
-        '@Symfony:risky' => true,
         '@PHP82Migration' => true,
-        'declare_strict_types' => true,
-        'strict_param' => true,
         'nullable_type_declaration_for_default_null_value' => true,
+        // Austral brace style: control structure braces on their own line, else/elseif/catch too
+        'braces_position' => [
+            'control_structures_opening_brace' => 'next_line_unless_newline_at_signature_end',
+        ],
+        'control_structure_continuation_position' => ['position' => 'next_line'],
+        // Keep the existing docblocks (@param / @return) and do not force a final period
+        'no_superfluous_phpdoc_tags' => false,
+        'phpdoc_summary' => false,
         'ordered_imports' => ['imports_order' => ['class', 'function', 'const']],
         'header_comment' => [
             'header' => <<<TXT
