@@ -12,7 +12,7 @@ Austral users, roles and user groups
 
 ## Requirements
 
-- PHP 8.2 or higher
+- PHP 8.4 or higher
 - Symfony 7.4
 
 ## Installation
@@ -50,7 +50,7 @@ The full documentation is available at https://austral.dev.
 
 | Bundle | Symfony | PHP | Branch |
 |--------|---------|-----|---------|
-| 4.x    | 7.4     | ≥ 8.2 | `4.x` |
+| 4.x    | 7.4     | ≥ 8.4 | `4.x` |
 | 3.1    | 5.4 / 6.4 | ≥ 8.0 | `3.1` (maintenance) |
 
 See the [CHANGELOG](CHANGELOG.md) and, to upgrade from 3.1, [UPGRADE-4.0](UPGRADE-4.0.md).

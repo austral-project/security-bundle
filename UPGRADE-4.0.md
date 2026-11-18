@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- PHP 8.2 minimum
+- PHP 8.4 minimum
 - Symfony 7.4
 - Doctrine ORM 3
 

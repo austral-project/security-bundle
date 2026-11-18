@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": ">=8.2 <9.0",
+        "php": ">=8.4 <9.0",
         "austral/contracts": "^4.0",
         "ext-sodium": "*",
         "austral/tools-bundle": "^4.0",

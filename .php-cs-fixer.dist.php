@@ -22,7 +22,7 @@ return (new PhpCsFixer\Config())
     ->setRiskyAllowed(false)
     ->setRules([
         '@Symfony' => true,
-        '@PHP82Migration' => true,
+        '@PHP8x4Migration' => true,
         'nullable_type_declaration_for_default_null_value' => true,
         // Austral brace style: control structure braces on their own line, else/elseif/catch too
         'braces_position' => [
