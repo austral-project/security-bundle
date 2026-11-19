@@ -29,6 +29,13 @@ return (new PhpCsFixer\Config())
             'control_structures_opening_brace' => 'next_line_unless_newline_at_signature_end',
         ],
         'control_structure_continuation_position' => ['position' => 'next_line'],
+        // Attributes of an argument stay on the same line as the argument (constructor promotion):
+        //   #[Autowire(service: 'x')] private Foo $foo,
+        'method_argument_space' => [
+            'on_multiline' => 'ensure_fully_multiline',
+            'after_heredoc' => true,
+            'attribute_placement' => 'same_line',
+        ],
         // Keep the existing docblocks (@param / @return) and do not force a final period
         'no_superfluous_phpdoc_tags' => false,
         'phpdoc_summary' => false,
