@@ -8,5 +8,6 @@
 /phpstan.dist.neon    export-ignore
 /phpunit.xml.dist     export-ignore
 /deptrac.yaml         export-ignore
+/composer-require-checker.json export-ignore
 
 * text=auto eol=lf
