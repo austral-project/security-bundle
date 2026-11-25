@@ -14,16 +14,16 @@ declare(strict_types=1);
 namespace Austral\SecurityBundle\Tests;
 
 use Austral\SecurityBundle\AustralSecurityBundle;
+use Austral\SecurityBundle\DependencyInjection\AustralSecurityExtension;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
-/**
- * Smoke test: the bundle can be loaded. To be completed with real tests.
- */
 final class BundleTest extends TestCase
 {
-    public function testBundleCanBeInstantiated(): void
-    {
-        self::assertInstanceOf(BundleInterface::class, new AustralSecurityBundle());
-    }
+  public function testTheExtensionOfTheBundle(): void
+  {
+    $extension = new AustralSecurityBundle()->getContainerExtension();
+
+    self::assertInstanceOf(AustralSecurityExtension::class, $extension);
+    self::assertSame('austral_security', $extension->getAlias());
+  }
 }

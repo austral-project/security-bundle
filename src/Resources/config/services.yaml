@@ -1,0 +1,101 @@
+services:
+
+##### Entity managers
+  Austral\SecurityBundle\EntityManager\UserEntityManager:
+    arguments:
+      $doctrineEntityManager: '@doctrine.orm.entity_manager'
+      $eventDispatcher: '@event_dispatcher'
+      $class: '%austral.entity.user.class%'
+
+  Austral\SecurityBundle\EntityManager\Interfaces\UserEntityManagerInterface:
+    alias: Austral\SecurityBundle\EntityManager\UserEntityManager
+
+  austral.entity_manager.user:
+    alias: Austral\SecurityBundle\EntityManager\UserEntityManager
+    public: true
+
+  Austral\SecurityBundle\EntityManager\RoleEntityManager:
+    arguments:
+      $doctrineEntityManager: '@doctrine.orm.entity_manager'
+      $eventDispatcher: '@event_dispatcher'
+      $class: '%austral.entity.role.class%'
+
+  austral.entity_manager.role:
+    alias: Austral\SecurityBundle\EntityManager\RoleEntityManager
+    public: true
+
+  Austral\SecurityBundle\EntityManager\GroupEntityManager:
+    arguments:
+      $doctrineEntityManager: '@doctrine.orm.entity_manager'
+      $eventDispatcher: '@event_dispatcher'
+      $class: '%austral.entity.group.class%'
+
+  austral.entity_manager.group:
+    alias: Austral\SecurityBundle\EntityManager\GroupEntityManager
+    public: true
+
+##### Security: provider, checker, voter (referenced by security.yaml)
+  Austral\SecurityBundle\Security\UserProvider:
+    arguments:
+      $users: '@Austral\SecurityBundle\EntityManager\Interfaces\UserEntityManagerInterface'
+
+  austral.security.user_provider:
+    alias: Austral\SecurityBundle\Security\UserProvider
+    public: true
+
+  Austral\SecurityBundle\Security\UserChecker: ~
+
+  austral.security.user_checker:
+    alias: Austral\SecurityBundle\Security\UserChecker
+    public: true
+
+  Austral\SecurityBundle\Security\Voter\RootVoter:
+    tags:
+      - { name: security.voter, priority: 1000 }
+
+##### Password
+  Austral\SecurityBundle\Password\PasswordUpdater:
+    arguments:
+      $passwordHasher: '@security.user_password_hasher'
+
+  austral.security.password_updater:
+    alias: Austral\SecurityBundle\Password\PasswordUpdater
+    public: true
+
+  Austral\SecurityBundle\Listener\PasswordListener:
+    arguments:
+      $passwordUpdater: '@Austral\SecurityBundle\Password\PasswordUpdater'
+    tags:
+      - { name: kernel.event_listener, event: 'austral.entity_manager.update', method: update }
+
+  austral.security.password.listener:
+    alias: Austral\SecurityBundle\Listener\PasswordListener
+
+  Austral\SecurityBundle\Password\PasswordResetManager:
+    arguments:
+      $users: '@Austral\SecurityBundle\EntityManager\Interfaces\UserEntityManagerInterface'
+      $dispatcher: '@event_dispatcher'
+      $lifetime: '%austral_security.password_reset.lifetime%'
+      $requestInterval: '%austral_security.password_reset.request_interval%'
+      $clock: '@?clock'
+
+  austral.security.password_reset:
+    alias: Austral\SecurityBundle\Password\PasswordResetManager
+    public: true
+
+##### Login link ($loginLinkHandler and $firewall are set by the extension)
+  Austral\SecurityBundle\LoginLink\LoginLinkRequester:
+    arguments:
+      $users: '@Austral\SecurityBundle\EntityManager\Interfaces\UserEntityManagerInterface'
+      $dispatcher: '@event_dispatcher'
+
+  austral.security.login_link:
+    alias: Austral\SecurityBundle\LoginLink\LoginLinkRequester
+    public: true
+
+##### Command
+  Austral\SecurityBundle\Command\UserCommand:
+    arguments:
+      $users: '@Austral\SecurityBundle\EntityManager\Interfaces\UserEntityManagerInterface'
+    tags:
+      - { name: console.command, command: 'austral:security:user' }

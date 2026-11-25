@@ -14,6 +14,7 @@ Austral users, roles and user groups
 
 - PHP 8.4 or higher
 - Symfony 7.4
+- Doctrine ORM 3
 
 ## Installation
 
@@ -30,17 +31,127 @@ return [
 ];
 ```
 
+The entities of the application extend the mapped superclasses of the bundle: copy them from `src/Skeleton/Entity`
+to `src/Entity/Austral/SecurityBundle` (the entity-bundle initializer does it).
+
+The firewall belongs to the application: the bundle gives the user provider, the user checker and the voter, the
+application declares them in its `config/packages/security.yaml` (admin-bundle documents its firewall):
+
+```yaml
+security:
+    role_hierarchy:
+        ROLE_ROOT: [ ROLE_ADMIN_ACCESS, ROLE_USER_ACCESS ]
+
+    password_hashers:
+        App\Entity\Austral\SecurityBundle\User: 'auto'
+
+    providers:
+        austral_security_user:
+            id: austral.security.user_provider
+
+    firewalls:
+        main:                                   # the firewall of the application
+            provider:       austral_security_user
+            user_checker:   austral.security.user_checker
+            form_login:
+                enable_csrf: true
+            login_link:                         # optional, for the login link
+                check_route:            app_login_link_check
+                signature_properties:   [ id, email, password, isActive ]
+                lifetime:               600
+                max_uses:               1
+                check_post_only:        true    # mail scanners do not use the link up
+```
+
 ## Configuration
 
 ```yaml
 # config/packages/austral_security.yaml
 austral_security:
-    # ...
+    entities:                   # classes of the application (the Doctrine associations are resolved to them)
+        user:   App\Entity\Austral\SecurityBundle\User
+        role:   App\Entity\Austral\SecurityBundle\Role
+        group:  App\Entity\Austral\SecurityBundle\Group
+    password_reset:
+        lifetime:           3600  # seconds a reset link is valid (60 minimum)
+        request_interval:   60    # seconds before a new link can be requested for the same user
+    login_link:
+        firewall:           ~     # firewall of security.yaml with "login_link"; no login link when not set
 ```
+
+The lifetime and the number of uses of a login link are set in `security.yaml`, under the `login_link` of the
+firewall.
 
 ## Usage
 
-<!-- Minimal, concrete example. -->
+### Users, roles and groups
+
+A user has a type (`root`, `admin` or `user`, giving `ROLE_ROOT`, `ROLE_ADMIN_ACCESS` or `ROLE_USER_ACCESS`), its
+own roles and the roles of its groups. A root user has all the rights: the `RootVoter` grants every attribute.
+
+```php
+$users = $container->get('austral.entity_manager.user');
+
+$user = $users->create(['email' => 'jane@austral.dev', 'username' => 'jane']);
+$user->setPlainPassword('secret')->setIsActive(true)->setTypeUser(UserInterface::USER_TYPE_ADMIN);
+$users->updateUser($user); // the plain password is hashed with the hasher of security.yaml, then cleared
+```
+
+From the command line (the password is asked, hidden, when `--password` is not given):
+
+```bash
+php bin/console austral:security:user --email=support@austral.dev --root --create --if-not-exist
+php bin/console austral:security:user --email=jane@austral.dev   # new password of a user
+```
+
+The login is the email (case insensitive) or the username. A disabled user cannot log in, and a user whose
+password changes or who is disabled is logged out at its next request.
+
+### Password reset
+
+The screens are those of admin-bundle; the bundle gives the mechanism. The link holds a random token: only its
+hash is saved, it expires, it is used once, and nothing tells whether a login exists.
+
+```php
+$passwordReset = $container->get('austral.security.password_reset');
+
+// "Forgot password" form: dispatches SecurityEvents::PASSWORD_RESET_REQUESTED with the link
+$passwordReset->request($login, fn (string $token): string => $urlGenerator->generate('app_reset', ['token' => $token], UrlGeneratorInterface::ABSOLUTE_URL));
+
+// Reset page
+$user = $passwordReset->verify($token);           // null: invalid or expired link
+$passwordReset->reset($token, $newPlainPassword); // dispatches SecurityEvents::PASSWORD_RESET
+```
+
+Send the email in a listener:
+
+```php
+#[AsEventListener(SecurityEvents::PASSWORD_RESET_REQUESTED)]
+public function onPasswordResetRequested(PasswordResetRequestedEvent $event): void
+{
+    // $event->getUser(), $event->getUrl(), $event->getExpiresAt()
+}
+```
+
+### Login link
+
+With `login_link` in the firewall and `austral_security.login_link.firewall` set:
+
+```php
+$container->get('austral.security.login_link')->request($login, $request);
+// dispatches SecurityEvents::LOGIN_LINK_REQUESTED (LoginLinkRequestedEvent: user, URL, expiry)
+```
+
+### Services
+
+| Service | |
+|---|---|
+| `austral.entity_manager.user`, `.role`, `.group` | entity managers |
+| `austral.security.user_provider` | user provider of `security.yaml` |
+| `austral.security.user_checker` | user checker of `security.yaml` |
+| `austral.security.password_updater` | hashes the plain password of a user |
+| `austral.security.password_reset` | `PasswordResetManager` |
+| `austral.security.login_link` | `LoginLinkRequester` |
 
 ## Documentation
 
