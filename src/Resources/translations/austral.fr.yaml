@@ -63,3 +63,19 @@ fields:
       master:
         first:                                  Mot de passe
         second:                                 Vérification du mot de passe
+
+# Bridge avec admin-bundle (clés à plat)
+'fields.keyname.entitled': Clé
+'fields.enabled.entitled': Activé
+'helpers.keyname': Calculée à partir du nom si elle est vide.
+'errors.plainPassword.blank': Le mot de passe est obligatoire.
+'errors.role.format': 'Une permission commence par « ROLE_ » suivi de majuscules, de chiffres et de « _ ».'
+'roles.list': Accès
+'roles.create': Créer
+'roles.edit': Modifier
+'roles.duplicate': Dupliquer
+'roles.delete': Supprimer
+'roles.truncate': Tout supprimer
+'roles.toggle': Modifier depuis la liste
+'roles.sort': Trier
+'roles.export': Exporter

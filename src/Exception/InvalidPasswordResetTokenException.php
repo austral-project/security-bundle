@@ -18,12 +18,6 @@ namespace Austral\SecurityBundle\Exception;
  */
 final class InvalidPasswordResetTokenException extends \RuntimeException
 {
-  /**
-   * InvalidPasswordResetTokenException constructor
-   *
-   * @param string          $message
-   * @param \Throwable|null $previous
-   */
   public function __construct(string $message = 'The password reset link is invalid or has expired.', ?\Throwable $previous = null)
   {
     parent::__construct($message, 0, $previous);

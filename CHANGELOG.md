@@ -7,7 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [Unreleased]
 
 The bundle is rewritten for 4.0: it keeps the users, roles and groups, the user provider and the password
-mechanisms; the login page, the screens and the admin modules move to admin-bundle. See UPGRADE-4.0.
+mechanisms; the login page and the screens move to admin-bundle, the admin modules to the bridge
+`Bridge/Admin`. See UPGRADE-4.0.
 
 ### Added
 
@@ -18,6 +19,9 @@ mechanisms; the login page, the screens and the admin modules move to admin-bund
   enumeration; events `SecurityEvents::PASSWORD_RESET_REQUESTED` and `SecurityEvents::PASSWORD_RESET`
 - `LoginLinkRequester` (`austral.security.login_link`): login link of the firewall (Symfony `login_link`),
   event `SecurityEvents::LOGIN_LINK_REQUESTED`
+- Bridge with admin-bundle (`Bridge/Admin`, loaded when `AustralAdminBundle` is enabled): the modules of the
+  administrators, users, groups and roles on the admin-bundle 4 API, POST + CSRF actions, the rights of a user
+  who is not root restricted (root users hidden, type root, groups and roles he does not have)
 - `RootVoter`: a root user has all the rights
 - `UserChecker` (`austral.security.user_checker`): a disabled user cannot log in
 - `PasswordUpdater` (`austral.security.password_updater`) and `PasswordListener`: the plain password is hashed
@@ -68,9 +72,10 @@ mechanisms; the login page, the screens and the admin modules move to admin-bund
 - `EntityManagerListener` (replaced by `PasswordListener`), `BaseUserEntityRepository`
 - `UserInterface::getSalt()` / `setSalt()`, `UserEntityManager::updatePassword()`, `deleteUser()` and
   `setPasswordHasherFactory()`
-- Moved to admin-bundle: the admin modules (`UserAdmin`, `AdminUserAdmin`, `GroupAdmin`, `RoleAdmin`,
-  `austral_admin.yaml`), `UserForm`, `DashboardListener`, `AuthenticatedController`, `routes.yaml` and the views
-  (login, layout, avatar)
+- Moved to admin-bundle: `UserForm`, `DashboardListener`, `AuthenticatedController`, `routes.yaml` and the
+  views (login, layout, avatar)
+- `Admin\UserAdmin`, `AdminUserAdmin`, `GroupAdmin`, `RoleAdmin`, `Resources/config/austral_admin.yaml`: moved to
+  `Bridge\Admin`
 - The skeleton `security.yaml` (`Resources/config/squelette`): the firewall belongs to the application, the
   one of the back office is documented by admin-bundle
 - Dependencies: austral/tools-bundle, ramsey/uuid, ext-sodium, symfony/framework-bundle

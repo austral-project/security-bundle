@@ -28,11 +28,6 @@ final class PasswordResetEvent extends Event
   {
   }
 
-  /**
-   * getUser
-   *
-   * @return UserInterface
-   */
   public function getUser(): UserInterface
   {
     return $this->user;

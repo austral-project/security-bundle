@@ -36,9 +36,6 @@ abstract class Role extends Entity implements RoleInterface
 {
   use EntityTimestampableTrait;
 
-  /**
-   * @var string
-   */
   #[ORM\Column(name: 'id', type: Types::STRING, length: 40)]
   #[ORM\Id]
   protected string $id;
@@ -55,21 +52,12 @@ abstract class Role extends Entity implements RoleInterface
   #[ORM\ManyToMany(targetEntity: GroupInterface::class, mappedBy: 'roles', cascade: ['persist'])]
   protected Collection $groups;
 
-  /**
-   * @var string
-   */
   #[ORM\Column(name: 'name', type: Types::STRING, length: 255, unique: true)]
   protected string $name = '';
 
-  /**
-   * @var string
-   */
   #[ORM\Column(name: 'role', type: Types::STRING, length: 255, unique: true)]
   protected string $role = '';
 
-  /**
-   * Role constructor
-   */
   public function __construct()
   {
     parent::__construct();
@@ -78,16 +66,13 @@ abstract class Role extends Entity implements RoleInterface
     $this->groups = new ArrayCollection();
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function __toString(): string
   {
     return $this->name;
   }
 
   /**
-   * {@inheritdoc}
+   * @return array<string, mixed>
    */
   public function arrayObject(): array
   {
@@ -99,9 +84,6 @@ abstract class Role extends Entity implements RoleInterface
     ];
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function addUser(UserInterface $user): self
   {
     if (!$this->users->contains($user))
@@ -113,9 +95,6 @@ abstract class Role extends Entity implements RoleInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function removeUser(UserInterface $user): self
   {
     if ($this->users->removeElement($user))
@@ -127,16 +106,13 @@ abstract class Role extends Entity implements RoleInterface
   }
 
   /**
-   * {@inheritdoc}
+   * @return Collection<int, UserInterface>
    */
   public function getUsers(): Collection
   {
     return $this->users;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function addGroup(GroupInterface $group): self
   {
     if (!$this->groups->contains($group))
@@ -148,9 +124,6 @@ abstract class Role extends Entity implements RoleInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function removeGroup(GroupInterface $group): self
   {
     if ($this->groups->removeElement($group))
@@ -162,16 +135,13 @@ abstract class Role extends Entity implements RoleInterface
   }
 
   /**
-   * {@inheritdoc}
+   * @return Collection<int, GroupInterface>
    */
   public function getGroups(): Collection
   {
     return $this->groups;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setName(string $name): self
   {
     $this->name = $name;
@@ -179,17 +149,11 @@ abstract class Role extends Entity implements RoleInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getName(): string
   {
     return $this->name;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setRole(string $role): self
   {
     $this->role = $role;
@@ -197,9 +161,6 @@ abstract class Role extends Entity implements RoleInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getRole(): string
   {
     return $this->role;

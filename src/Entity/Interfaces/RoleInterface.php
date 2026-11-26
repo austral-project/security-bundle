@@ -23,22 +23,8 @@ use Doctrine\Common\Collections\Collection;
  */
 interface RoleInterface extends EntityInterface
 {
-  /**
-   * addUser
-   *
-   * @param UserInterface $user
-   *
-   * @return self
-   */
   public function addUser(UserInterface $user): self;
 
-  /**
-   * removeUser
-   *
-   * @param UserInterface $user
-   *
-   * @return self
-   */
   public function removeUser(UserInterface $user): self;
 
   /**
@@ -46,22 +32,8 @@ interface RoleInterface extends EntityInterface
    */
   public function getUsers(): Collection;
 
-  /**
-   * addGroup
-   *
-   * @param GroupInterface $group
-   *
-   * @return self
-   */
   public function addGroup(GroupInterface $group): self;
 
-  /**
-   * removeGroup
-   *
-   * @param GroupInterface $group
-   *
-   * @return self
-   */
   public function removeGroup(GroupInterface $group): self;
 
   /**
@@ -69,35 +41,11 @@ interface RoleInterface extends EntityInterface
    */
   public function getGroups(): Collection;
 
-  /**
-   * setName
-   *
-   * @param string $name
-   *
-   * @return self
-   */
   public function setName(string $name): self;
 
-  /**
-   * getName
-   *
-   * @return string
-   */
   public function getName(): string;
 
-  /**
-   * setRole
-   *
-   * @param string $role
-   *
-   * @return self
-   */
   public function setRole(string $role): self;
 
-  /**
-   * getRole
-   *
-   * @return string
-   */
   public function getRole(): string;
 }

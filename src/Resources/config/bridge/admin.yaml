@@ -1,0 +1,35 @@
+# Services of the bridge with admin-bundle, loaded only when AustralAdminBundle is enabled (AustralSecurityExtension).
+services:
+
+  Austral\SecurityBundle\Bridge\Admin\UserAdmin:
+    arguments:
+      $tokenStorage: '@security.token_storage'
+      $authorizationChecker: '@security.authorization_checker'
+      $groupClass: '%austral.entity.group.class%'
+      $languages: '%austral_admin.languages.interface%'
+    tags:
+      - { name: austral.admin }
+
+  Austral\SecurityBundle\Bridge\Admin\AdminUserAdmin:
+    arguments:
+      $tokenStorage: '@security.token_storage'
+      $authorizationChecker: '@security.authorization_checker'
+      $groupClass: '%austral.entity.group.class%'
+      $languages: '%austral_admin.languages.interface%'
+    tags:
+      - { name: austral.admin }
+
+  Austral\SecurityBundle\Bridge\Admin\GroupAdmin:
+    arguments:
+      $roleTree: '@Austral\AdminBundle\Security\RoleTree'
+      $roleEntityManager: '@Austral\SecurityBundle\EntityManager\RoleEntityManager'
+      $authorizationChecker: '@security.authorization_checker'
+    tags:
+      - { name: austral.admin }
+
+  Austral\SecurityBundle\Bridge\Admin\RoleAdmin:
+    arguments:
+      $authorizationChecker: '@security.authorization_checker'
+    tags:
+      - { name: austral.admin }
+

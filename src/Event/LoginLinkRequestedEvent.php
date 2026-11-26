@@ -35,31 +35,16 @@ final class LoginLinkRequestedEvent extends Event
   ) {
   }
 
-  /**
-   * getUser
-   *
-   * @return UserInterface
-   */
   public function getUser(): UserInterface
   {
     return $this->user;
   }
 
-  /**
-   * getUrl
-   *
-   * @return string
-   */
   public function getUrl(): string
   {
     return $this->url;
   }
 
-  /**
-   * getExpiresAt
-   *
-   * @return \DateTimeImmutable
-   */
   public function getExpiresAt(): \DateTimeImmutable
   {
     return $this->expiresAt;

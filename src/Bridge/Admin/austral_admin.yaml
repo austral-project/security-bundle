@@ -1,0 +1,58 @@
+# Modules of security-bundle in admin-bundle, added before the configuration of the application
+# (AustralSecurityExtension::prepend(), only when admin-bundle is enabled). The application changes or disables
+# them in config/packages/austral_admin.yaml:
+#
+#   austral_admin:
+#     modules:
+#       security:
+#         children:
+#           users: { enabled: false }
+#
+# The routes and the roles of the 3.1 are kept: ROLE_SECURITY_ADMIN_USERS, ROLE_SECURITY_USERS_EDIT...
+austral_admin:
+  modules:
+    security:
+      name:                       Security
+      picto:                      austral-picto-lock
+      route:                      security
+      translate:                  female_c
+      navigation:
+        position:                 1000
+      children:
+        admin-user:
+          name:                   Users - Admin
+          picto:                  austral-picto-user
+          pictoTile:              user
+          route:                  admin-users
+          class:                  Austral\SecurityBundle\Bridge\Admin\AdminUserAdmin
+          entity_manager:         austral.entity_manager.user
+          translate:              male_v
+          downloadFormats:        [ csv, json ]
+          disabledActions:        [ duplicate ]
+        user:
+          name:                   Users
+          picto:                  austral-picto-user
+          pictoTile:              user
+          route:                  users
+          class:                  Austral\SecurityBundle\Bridge\Admin\UserAdmin
+          entity_manager:         austral.entity_manager.user
+          translate:              male_v
+          downloadFormats:        [ csv, json ]
+          disabledActions:        [ duplicate ]
+        group:
+          name:                   Groups
+          picto:                  austral-picto-user
+          pictoTile:              lock
+          route:                  groups
+          class:                  Austral\SecurityBundle\Bridge\Admin\GroupAdmin
+          entity_manager:         austral.entity_manager.group
+          translate:              male_c
+        role:
+          name:                   Roles
+          picto:                  austral-picto-user
+          pictoTile:              lock
+          route:                  roles
+          class:                  Austral\SecurityBundle\Bridge\Admin\RoleAdmin
+          entity_manager:         austral.entity_manager.role
+          translate:              male_c
+          disabledActions:        [ duplicate ]

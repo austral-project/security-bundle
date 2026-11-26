@@ -142,6 +142,34 @@ $container->get('austral.security.login_link')->request($login, $request);
 // dispatches SecurityEvents::LOGIN_LINK_REQUESTED (LoginLinkRequestedEvent: user, URL, expiry)
 ```
 
+### Back office (admin-bundle)
+
+With admin-bundle, the bridge `src/Bridge/Admin` adds the modules `security/admin-users`, `security/users`,
+`security/groups` and `security/roles` (their Admin classes and `Bridge/Admin/austral_admin.yaml`). The bridge
+is loaded only when `AustralAdminBundle` is enabled; the login pages and "my account" are in admin-bundle.
+
+- **Administrators** (types admin and root) and **users** (type user): list, filters, export CSV / JSON, the
+  switch "enabled" in the list.
+- **Groups**: the roles of the admin modules as switches, by module; a role missing in the database is created
+  when it is given.
+- **Roles**: the roles saved in the database.
+
+A user who is not root does not see the root users, does not give the type root, gives only the groups and the
+roles he has (the groups he cannot give stay on the account), and does not turn a role into another one; nobody
+disables or deletes his own account. The roles of the modules are those of 3.1 (`ROLE_SECURITY_ADMIN_USERS`,
+`ROLE_SECURITY_USERS_EDIT`...).
+
+The application changes or disables the modules in `config/packages/austral_admin.yaml`:
+
+```yaml
+austral_admin:
+    modules:
+        security:
+            children:
+                users: { enabled: false }
+                admin-user: { downloadFormats: [ csv ] }
+```
+
 ### Services
 
 | Service | |

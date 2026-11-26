@@ -36,9 +36,6 @@ abstract class Group extends Entity implements GroupInterface
 {
   use EntityTimestampableTrait;
 
-  /**
-   * @var string
-   */
   #[ORM\Column(name: 'id', type: Types::STRING, length: 40)]
   #[ORM\Id]
   protected string $id;
@@ -58,21 +55,12 @@ abstract class Group extends Entity implements GroupInterface
   #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
   protected Collection $roles;
 
-  /**
-   * @var string
-   */
   #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
   protected string $name = '';
 
-  /**
-   * @var string
-   */
   #[ORM\Column(name: 'keyname', type: Types::STRING, length: 255)]
   protected string $keyname = '';
 
-  /**
-   * Group constructor
-   */
   public function __construct()
   {
     parent::__construct();
@@ -81,16 +69,13 @@ abstract class Group extends Entity implements GroupInterface
     $this->roles = new ArrayCollection();
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function __toString(): string
   {
     return $this->name;
   }
 
   /**
-   * {@inheritdoc}
+   * @return array<string, mixed>
    */
   public function arrayObject(): array
   {
@@ -101,9 +86,6 @@ abstract class Group extends Entity implements GroupInterface
     ];
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function addUser(UserInterface $user): self
   {
     if (!$this->users->contains($user))
@@ -115,9 +97,6 @@ abstract class Group extends Entity implements GroupInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function removeUser(UserInterface $user): self
   {
     if ($this->users->removeElement($user))
@@ -129,16 +108,13 @@ abstract class Group extends Entity implements GroupInterface
   }
 
   /**
-   * {@inheritdoc}
+   * @return Collection<int, UserInterface>
    */
   public function getUsers(): Collection
   {
     return $this->users;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function addRole(RoleInterface $role): self
   {
     if (!$this->roles->contains($role))
@@ -150,9 +126,6 @@ abstract class Group extends Entity implements GroupInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function removeRole(RoleInterface $role): self
   {
     if ($this->roles->removeElement($role))
@@ -164,7 +137,7 @@ abstract class Group extends Entity implements GroupInterface
   }
 
   /**
-   * {@inheritdoc}
+   * @return Collection<int, RoleInterface>
    */
   public function getRoles(): Collection
   {
@@ -172,7 +145,7 @@ abstract class Group extends Entity implements GroupInterface
   }
 
   /**
-   * {@inheritdoc}
+   * @return list<string>
    */
   public function getRolesArray(): array
   {
@@ -185,9 +158,6 @@ abstract class Group extends Entity implements GroupInterface
     return $roles;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setName(string $name): self
   {
     $this->name = $name;
@@ -195,25 +165,16 @@ abstract class Group extends Entity implements GroupInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getName(): string
   {
     return $this->name;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getKeyname(): string
   {
     return $this->keyname;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setKeyname(string $keyname): self
   {
     $this->keyname = $keyname;

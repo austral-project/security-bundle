@@ -113,17 +113,22 @@ austral_security:
 `security.authorization_checker` is no longer replaced: a root user is granted everything by the `RootVoter`
 (priority 1000), the other users go through the usual voters.
 
-### Moved to admin-bundle
+### Moved to admin-bundle and to the bridge
 
-The login page and everything that belongs to the back office:
+The login page and the screens belong to admin-bundle, the admin modules to the bridge of this bundle:
 
 | 3.1 | 4.0 |
 |---|---|
 | `Controller\AuthenticatedController`, `Resources/config/routes.yaml` | admin-bundle (routes `austral_admin_security_*`) |
 | `Resources/views/login.html.twig`, `Layout/*`, `List/Components/avatar.html.twig` | admin-bundle |
-| `Admin\UserAdmin`, `AdminUserAdmin`, `GroupAdmin`, `RoleAdmin`, `austral_admin.yaml` | admin-bundle |
-| `Form\Austral\UserForm` | admin-bundle (new form API) |
-| `Listener\DashboardListener` | admin-bundle |
+| `Admin\UserAdmin`, `AdminUserAdmin`, `GroupAdmin`, `RoleAdmin` | `Bridge\Admin\UserAdmin`, `AdminUserAdmin`, `GroupAdmin`, `RoleAdmin` (admin-bundle 4 API) |
+| `Resources/config/austral_admin.yaml` (parameter `austral_admin.modules.security_bundle`) | `Bridge/Admin/austral_admin.yaml`, configuration `austral_admin.modules.security` |
+| parameters `austral.admin.modules.security_bundle.*.enabled` | `austral_admin: { modules: { security: { children: { users: { enabled: false } } } } }` |
+| `Form\Austral\UserForm` | the form of `Bridge\Admin\AbstractUserAdmin` (form-bundle 4) |
+| `Listener\DashboardListener` | the tiles of the dashboard of admin-bundle |
+
+The paths and the roles of the modules do not change. The users, administrators and roles cannot be duplicated
+any more.
 
 ### Removed or changed classes and methods
 

@@ -13,6 +13,12 @@ declare(strict_types=1);
 
 namespace Austral\SecurityBundle\Tests\DependencyInjection;
 
+use Austral\AdminBundle\AustralAdminBundle;
+use Austral\AdminBundle\DependencyInjection\AustralAdminExtension;
+use Austral\SecurityBundle\Bridge\Admin\AdminUserAdmin;
+use Austral\SecurityBundle\Bridge\Admin\GroupAdmin;
+use Austral\SecurityBundle\Bridge\Admin\RoleAdmin;
+use Austral\SecurityBundle\Bridge\Admin\UserAdmin;
 use Austral\SecurityBundle\Command\UserCommand;
 use Austral\SecurityBundle\DependencyInjection\AustralSecurityExtension;
 use Austral\SecurityBundle\Entity\Interfaces\GroupInterface;
@@ -149,12 +155,38 @@ final class AustralSecurityExtensionTest extends TestCase
     self::assertSame([], $container->getExtensionConfig('doctrine'));
   }
 
-  /**
-   * @param array<string, mixed> $config
-   */
-  private function load(array $config = []): ContainerBuilder
+  public function testTheBridgeWithAdminBundleIsLoadedWhenTheBundleIsEnabled(): void
+  {
+    self::assertFalse($this->load()->hasDefinition(UserAdmin::class));
+
+    $container = $this->load([], ['AustralAdminBundle' => AustralAdminBundle::class]);
+    foreach ([UserAdmin::class, AdminUserAdmin::class, GroupAdmin::class, RoleAdmin::class] as $id)
+    {
+      self::assertTrue($container->getDefinition($id)->hasTag('austral.admin'), $id);
+    }
+  }
+
+  public function testTheModulesOfTheBridgeArePrepended(): void
   {
     $container = new ContainerBuilder();
+    new AustralSecurityExtension()->prepend($container);
+    self::assertSame([], $container->getExtensionConfig('austral_admin'), 'Nothing without admin-bundle.');
+
+    $container->registerExtension(new AustralAdminExtension());
+    new AustralSecurityExtension()->prepend($container);
+    $modules = $container->getExtensionConfig('austral_admin')[0]['modules'] ?? [];
+    self::assertSame(['admin-user', 'user', 'group', 'role'], array_keys($modules['security']['children'] ?? []));
+    self::assertSame(UserAdmin::class, $modules['security']['children']['user']['class'] ?? null);
+  }
+
+  /**
+   * @param array<string, mixed>        $config
+   * @param array<string, class-string> $bundles
+   */
+  private function load(array $config = [], array $bundles = []): ContainerBuilder
+  {
+    $container = new ContainerBuilder();
+    $container->setParameter('kernel.bundles', $bundles);
     foreach (['doctrine.orm.entity_manager', 'event_dispatcher', 'security.user_password_hasher'] as $id)
     {
       $container->setDefinition($id, new Definition()->setSynthetic(true)->setPublic(true));

@@ -1,68 +1,75 @@
 {
-    "name": "austral/security-bundle",
-    "type": "symfony-bundle",
-    "description": "Austral users, roles and user groups",
-    "keywords": [
-        "Austral",
-        "User",
-        "Security"
-    ],
-    "license": "MIT",
-    "homepage": "https://austral.dev",
-    "authors": [
-        {
-            "name": "Matthieu Beurel",
-            "email": "matthieu@austral.dev",
-            "role": "Developer"
-        }
-    ],
-    "require": {
-        "php": ">=8.4 <9.0",
-        "ext-mbstring": "*",
-        "austral/contracts": "^4.0",
-        "austral/entity-bundle": "^4.0",
-        "austral/entity-file-bundle": "^4.0",
-        "doctrine/collections": "^2.2 || ^3.1",
-        "doctrine/dbal": "^4.0",
-        "doctrine/orm": "^3.7",
-        "psr/clock": "^1.0",
-        "symfony/config": "^7.4",
-        "symfony/console": "^7.4",
-        "symfony/dependency-injection": "^7.4",
-        "symfony/event-dispatcher-contracts": "^3.5",
-        "symfony/http-foundation": "^7.4",
-        "symfony/http-kernel": "^7.4",
-        "symfony/password-hasher": "^7.4",
-        "symfony/security-bundle": "^7.4",
-        "symfony/security-core": "^7.4",
-        "symfony/security-http": "^7.4",
-        "symfony/uid": "^7.4",
-        "symfony/yaml": "^7.4"
-    },
-    "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.64",
-        "phpstan/phpstan": "^2.0",
-        "phpstan/phpstan-symfony": "^2.0",
-        "phpunit/phpunit": "^11.5",
-        "symfony/clock": "^7.4",
-        "symfony/event-dispatcher": "^7.4"
-    },
-    "suggest": {
-        "symfony/rate-limiter": "For login_throttling in the firewall of the skeleton security.yaml"
-    },
-    "config": {
-        "sort-packages": true
-    },
-    "autoload": {
-        "psr-4": {
-            "Austral\\SecurityBundle\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Austral\\SecurityBundle\\Tests\\": "tests/"
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+  "name": "austral/security-bundle",
+  "type": "symfony-bundle",
+  "description": "Austral users, roles and user groups",
+  "keywords": [
+    "Austral",
+    "User",
+    "Security"
+  ],
+  "license": "MIT",
+  "homepage": "https://austral.dev",
+  "authors": [
+    {
+      "name": "Matthieu Beurel",
+      "email": "matthieu@austral.dev",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=8.4 <9.0",
+    "ext-mbstring": "*",
+    "austral/contracts": "^4.0",
+    "austral/entity-bundle": "^4.0",
+    "austral/entity-file-bundle": "^4.0",
+    "doctrine/collections": "^2.2 || ^3.1",
+    "doctrine/dbal": "^4.0",
+    "doctrine/orm": "^3.7",
+    "psr/clock": "^1.0",
+    "symfony/config": "^7.4",
+    "symfony/console": "^7.4",
+    "symfony/dependency-injection": "^7.4",
+    "symfony/event-dispatcher-contracts": "^3.5",
+    "symfony/http-foundation": "^7.4",
+    "symfony/http-kernel": "^7.4",
+    "symfony/password-hasher": "^7.4",
+    "symfony/security-bundle": "^7.4",
+    "symfony/security-core": "^7.4",
+    "symfony/security-http": "^7.4",
+    "symfony/uid": "^7.4",
+    "symfony/yaml": "^7.4"
+  },
+  "require-dev": {
+    "austral/admin-bundle": "^4.0",
+    "doctrine/doctrine-bundle": "^2.15 || ^3.0",
+    "friendsofphp/php-cs-fixer": "^3.64",
+    "phpstan/phpstan": "^2.0",
+    "phpstan/phpstan-symfony": "^2.0",
+    "phpunit/phpunit": "^11.5",
+    "symfony/browser-kit": "^7.4",
+    "symfony/clock": "^7.4",
+    "symfony/css-selector": "^7.4",
+    "symfony/dom-crawler": "^7.4",
+    "symfony/event-dispatcher": "^7.4",
+    "symfony/framework-bundle": "^7.4"
+  },
+  "suggest": {
+    "austral/admin-bundle": "For the modules of the users, administrators, groups and roles in the back office (Bridge/Admin)",
+    "symfony/rate-limiter": "For login_throttling in the firewall of the skeleton security.yaml"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "Austral\\SecurityBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Austral\\SecurityBundle\\Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
 }

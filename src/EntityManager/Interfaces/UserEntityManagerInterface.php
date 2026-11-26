@@ -30,40 +30,12 @@ interface UserEntityManagerInterface extends EntityManagerORMInterface
    */
   public function create(array $values = []): UserInterface;
 
-  /**
-   * retrieveByEmail
-   *
-   * @param string $email
-   *
-   * @return UserInterface|null
-   */
   public function retrieveByEmail(string $email): ?UserInterface;
 
-  /**
-   * retrieveByLogin
-   *
-   * @param string $login
-   *
-   * @return UserInterface|null
-   */
   public function retrieveByLogin(string $login): ?UserInterface;
 
-  /**
-   * retrieveUserById
-   *
-   * @param string $id
-   *
-   * @return UserInterface|null
-   */
   public function retrieveUserById(string $id): ?UserInterface;
 
-  /**
-   * retrieveByPasswordResetSelector
-   *
-   * @param string $selector
-   *
-   * @return UserInterface|null
-   */
   public function retrieveByPasswordResetSelector(string $selector): ?UserInterface;
 
   /**

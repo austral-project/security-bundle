@@ -37,41 +37,21 @@ final class PasswordResetRequestedEvent extends Event
   ) {
   }
 
-  /**
-   * getUser
-   *
-   * @return UserInterface
-   */
   public function getUser(): UserInterface
   {
     return $this->user;
   }
 
-  /**
-   * getToken
-   *
-   * @return string
-   */
   public function getToken(): string
   {
     return $this->token;
   }
 
-  /**
-   * getUrl
-   *
-   * @return string
-   */
   public function getUrl(): string
   {
     return $this->url;
   }
 
-  /**
-   * getExpiresAt
-   *
-   * @return \DateTimeImmutable
-   */
   public function getExpiresAt(): \DateTimeImmutable
   {
     return $this->expiresAt;

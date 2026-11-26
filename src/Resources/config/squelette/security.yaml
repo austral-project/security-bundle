@@ -1,0 +1,58 @@
+# Security of an Austral application (Symfony 7.4), copied to config/packages/security.yaml.
+#
+# The login, login link and password reset pages are those of admin-bundle.
+# login_throttling needs symfony/rate-limiter, login_link max_uses a cache pool (cache.app by default).
+security:
+  role_hierarchy:
+    ROLE_ROOT:                  [ ROLE_ADMIN_ACCESS, ROLE_USER_ACCESS ]
+
+  password_hashers:
+    # "auto": the best hasher available (sodium / bcrypt), passwords rehashed at login when it changes
+    App\Entity\Austral\SecurityBundle\User: 'auto'
+
+  providers:
+    austral_security_user:
+      id:                       austral.security.user_provider
+
+  firewalls:
+    dev:
+      pattern:                  ^/(_(profiler|wdt)|css|images|js)/
+      security:                 false
+
+    austral_admin:
+      pattern:                  ^/%austral.admin.path%
+      lazy:                     true
+      provider:                 austral_security_user
+      user_checker:             austral.security.user_checker
+      form_login:
+        login_path:             austral_admin_security_login
+        check_path:             austral_admin_security_login
+        default_target_path:    austral_admin_index
+        use_referer:            true
+        enable_csrf:            true
+      login_link:
+        check_route:            austral_admin_security_login_link_check
+        # the link stops working when one of these properties changes
+        signature_properties:   [ id, email, password, isActive ]
+        lifetime:               600 # seconds
+        max_uses:               1
+        # the link opens a confirmation page and logs in on submit: mail scanners do not use the link up
+        check_post_only:        true
+        login_path:             austral_admin_security_login
+        default_target_path:    austral_admin_index
+      login_throttling:
+        max_attempts:           5
+        interval:               '15 minutes'
+      remember_me:
+        secret:                 '%kernel.secret%'
+        lifetime:               604800 # 1 week, only when "remember me" is checked
+        signature_properties:   [ password, isActive ]
+      logout:
+        path:                   austral_admin_security_logout
+        target:                 austral_admin_security_login
+
+  # Only the first matching rule is used
+  access_control:
+    - { path: '^/%austral.admin.path%/(login|logout|password)', roles: PUBLIC_ACCESS }
+    - { path: '^/%austral.admin.path%/translation-([a-z]{2})\.js$', roles: PUBLIC_ACCESS }
+    - { path: '^/%austral.admin.path%', roles: ROLE_ADMIN_ACCESS }

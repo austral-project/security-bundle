@@ -52,9 +52,6 @@ abstract class User extends Entity implements UserInterface, CropperInterface
 
   use EntityTimestampableTrait;
 
-  /**
-   * @var string
-   */
   #[ORM\Column(name: 'id', type: Types::STRING, length: 40)]
   #[ORM\Id]
   protected string $id;
@@ -77,95 +74,50 @@ abstract class User extends Entity implements UserInterface, CropperInterface
   #[ORM\InverseJoinColumn(name: 'group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
   protected Collection $groups;
 
-  /**
-   * @var string
-   */
   #[ORM\Column(name: 'username', type: Types::STRING, length: 255, unique: true)]
   protected string $username = '';
 
-  /**
-   * @var string
-   */
   #[ORM\Column(name: 'email', type: Types::STRING, length: 255, unique: true)]
   protected string $email = '';
 
-  /**
-   * @var string|null
-   */
   #[ORM\Column(name: 'firstname', type: Types::STRING, length: 255, nullable: true)]
   protected ?string $firstname = null;
 
-  /**
-   * @var string|null
-   */
   #[ORM\Column(name: 'lastname', type: Types::STRING, length: 255, nullable: true)]
   protected ?string $lastname = null;
 
-  /**
-   * @var string|null
-   */
   #[ORM\Column(name: 'avatar', type: Types::STRING, length: 255, nullable: true)]
   #[AustralFile\UploadParameters(configName: 'avatar')]
   #[AustralFile\ImageSize]
   #[AustralFile\Croppers(croppers: [new AustralFile\Cropper(name: 'avatar')])]
   protected ?string $avatar = null;
 
-  /**
-   * @var string|null
-   */
   #[ORM\Column(name: 'avatar_color', type: Types::STRING, length: 34, nullable: true)]
   protected ?string $avatarColor = null;
 
-  /**
-   * @var string|null
-   */
   #[ORM\Column(name: 'language', type: Types::STRING, length: 4, nullable: true)]
   protected ?string $language = null;
 
-  /**
-   * @var string
-   */
   #[ORM\Column(name: 'password', type: Types::STRING, length: 255)]
   protected string $password = '';
 
-  /**
-   * @var string|null
-   */
   protected ?string $plainPassword = null;
 
-  /**
-   * @var bool
-   */
   #[ORM\Column(name: 'is_active', type: Types::BOOLEAN)]
   protected bool $isActive = false;
 
-  /**
-   * @var string|null
-   */
   #[ORM\Column(name: 'type_user', type: Types::STRING, length: 255, nullable: true)]
   protected ?string $typeUser = null;
 
-  /**
-   * @var string|null
-   */
   #[ORM\Column(name: 'interface_theme', type: Types::STRING, length: 255, nullable: true)]
   protected ?string $interfaceTheme = null;
 
-  /**
-   * @var string|null
-   */
   #[ORM\Column(name: 'password_reset_selector', type: Types::STRING, length: 32, unique: true, nullable: true)]
   protected ?string $passwordResetSelector = null;
 
-  /**
-   * @var string|null
-   */
   #[ORM\Column(name: 'password_reset_hash', type: Types::STRING, length: 128, nullable: true)]
   protected ?string $passwordResetHash = null;
 
-  /**
-   * @var \DateTimeImmutable|null
-   */
   #[ORM\Column(name: 'password_reset_expires_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
   protected ?\DateTimeImmutable $passwordResetExpiresAt = null;
 
@@ -174,9 +126,6 @@ abstract class User extends Entity implements UserInterface, CropperInterface
    */
   private ?string $passwordFingerprint = null;
 
-  /**
-   * User constructor
-   */
   public function __construct()
   {
     parent::__construct();
@@ -197,7 +146,9 @@ abstract class User extends Entity implements UserInterface, CropperInterface
   }
 
   /**
-   * {@inheritdoc}
+   * What the session keeps of the user: never the password hash nor the reset token.
+   *
+   * @return array<string, mixed>
    */
   public function __serialize(): array
   {
@@ -259,7 +210,7 @@ abstract class User extends Entity implements UserInterface, CropperInterface
   }
 
   /**
-   * {@inheritdoc}
+   * @return array<string, mixed>
    */
   public function arrayObject(): array
   {
@@ -271,32 +222,25 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     ];
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function isSuperAdmin(): bool
   {
     return self::USER_TYPE_ROOT === $this->getTypeUser();
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function isAdmin(): bool
   {
     return self::USER_TYPE_ADMIN === $this->getTypeUser();
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function isUser(): bool
   {
     return self::USER_TYPE_USER === $this->getTypeUser();
   }
 
   /**
-   * {@inheritdoc}
+   * Role of the type of user, roles of the user and roles of its groups.
+   *
+   * @return list<string>
    */
   public function getRoles(): array
   {
@@ -321,9 +265,6 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return array_values(array_unique($roles));
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function addSecurityRole(RoleInterface $role): self
   {
     if (!$this->securityRoles->contains($role))
@@ -335,9 +276,6 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function removeSecurityRole(RoleInterface $role): self
   {
     if ($this->securityRoles->removeElement($role))
@@ -349,16 +287,13 @@ abstract class User extends Entity implements UserInterface, CropperInterface
   }
 
   /**
-   * {@inheritdoc}
+   * @return Collection<int, RoleInterface>
    */
   public function getSecurityRoles(): Collection
   {
     return $this->securityRoles;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function addGroup(GroupInterface $group): self
   {
     if (!$this->groups->contains($group))
@@ -370,9 +305,6 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function removeGroup(GroupInterface $group): self
   {
     if ($this->groups->removeElement($group))
@@ -384,7 +316,7 @@ abstract class User extends Entity implements UserInterface, CropperInterface
   }
 
   /**
-   * {@inheritdoc}
+   * @return Collection<int, GroupInterface>
    */
   public function getGroups(): Collection
   {
@@ -392,7 +324,7 @@ abstract class User extends Entity implements UserInterface, CropperInterface
   }
 
   /**
-   * {@inheritdoc}
+   * @return non-empty-string The username, the id when the username is empty
    */
   public function getUserIdentifier(): string
   {
@@ -413,17 +345,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
   {
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getUsername(): string
   {
     return $this->username;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setUsername(string $username): self
   {
     $this->username = $username;
@@ -431,17 +357,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getEmail(): string
   {
     return $this->email;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setEmail(string $email): self
   {
     $this->email = $email;
@@ -449,17 +369,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getFirstname(): ?string
   {
     return $this->firstname;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setFirstname(?string $firstname): self
   {
     $this->firstname = $firstname;
@@ -467,17 +381,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getLastname(): ?string
   {
     return $this->lastname;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setLastname(?string $lastname): self
   {
     $this->lastname = $lastname;
@@ -485,17 +393,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getAvatar(): ?string
   {
     return $this->avatar;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setAvatar(?string $avatar): self
   {
     $this->avatar = $avatar;
@@ -503,17 +405,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getAvatarColor(): ?string
   {
     return $this->avatarColor;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setAvatarColor(?string $avatarColor): self
   {
     $this->avatarColor = $avatarColor;
@@ -521,17 +417,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getLanguage(): ?string
   {
     return $this->language;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setLanguage(?string $language): self
   {
     $this->language = $language;
@@ -539,17 +429,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getPassword(): ?string
   {
     return $this->password;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setPassword(string $password): self
   {
     $this->password = $password;
@@ -557,17 +441,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getPlainPassword(): ?string
   {
     return $this->plainPassword;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setPlainPassword(?string $plainPassword): self
   {
     $this->plainPassword = $plainPassword;
@@ -575,17 +453,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getIsActive(): bool
   {
     return $this->isActive;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setIsActive(bool $isActive): self
   {
     $this->isActive = $isActive;
@@ -593,17 +465,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getTypeUser(): string
   {
     return $this->typeUser ?? self::USER_TYPE_USER;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setTypeUser(string $typeUser): self
   {
     if (!\in_array($typeUser, [self::USER_TYPE_ROOT, self::USER_TYPE_ADMIN, self::USER_TYPE_USER], true))
@@ -615,17 +481,11 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getInterfaceTheme(): string
   {
     return $this->interfaceTheme ?? self::USER_INTERFACE_AUTO;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setInterfaceTheme(?string $interfaceTheme): self
   {
     $this->interfaceTheme = $interfaceTheme;
@@ -633,33 +493,21 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getPasswordResetSelector(): ?string
   {
     return $this->passwordResetSelector;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getPasswordResetHash(): ?string
   {
     return $this->passwordResetHash;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function getPasswordResetExpiresAt(): ?\DateTimeImmutable
   {
     return $this->passwordResetExpiresAt;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function setPasswordReset(string $selector, string $hash, \DateTimeImmutable $expiresAt): self
   {
     $this->passwordResetSelector = $selector;
@@ -669,9 +517,6 @@ abstract class User extends Entity implements UserInterface, CropperInterface
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function clearPasswordReset(): self
   {
     $this->passwordResetSelector = null;

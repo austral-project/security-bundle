@@ -11,6 +11,7 @@
 
 namespace Austral\SecurityBundle\DependencyInjection;
 
+use Austral\AdminBundle\DependencyInjection\AdminModulesPrepender;
 use Austral\SecurityBundle\Entity\Interfaces\GroupInterface;
 use Austral\SecurityBundle\Entity\Interfaces\RoleInterface;
 use Austral\SecurityBundle\Entity\Interfaces\UserInterface;
@@ -39,6 +40,11 @@ class AustralSecurityExtension extends Extension implements PrependExtensionInte
    */
   public function prepend(ContainerBuilder $container): void
   {
+    // Bridge: the modules of the users, groups and roles in admin-bundle, when it is enabled.
+    if (class_exists(AdminModulesPrepender::class))
+    {
+      AdminModulesPrepender::prepend($container, __DIR__.'/../Bridge/Admin/austral_admin.yaml');
+    }
     if (!$container->hasExtension('doctrine'))
     {
       return;
@@ -73,6 +79,10 @@ class AustralSecurityExtension extends Extension implements PrependExtensionInte
     $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
     $loader->load('services.yaml');
     $loader->load('austral_entity_file.yaml');
+    if (self::isBundleEnabled($container, 'AustralAdminBundle'))
+    {
+      $loader->load('bridge/admin.yaml');
+    }
 
     // The firewall is in the security.yaml of the application; its login_link handler exists only when it has
     // "login_link".
@@ -83,6 +93,19 @@ class AustralSecurityExtension extends Extension implements PrependExtensionInte
         ->setArgument('$loginLinkHandler', new Reference("security.authenticator.login_link_handler.{$firewall}", ContainerInterface::NULL_ON_INVALID_REFERENCE))
         ->setArgument('$firewall', $firewall);
     }
+  }
+
+  /**
+   * @param ContainerBuilder $container
+   * @param string           $name
+   *
+   * @return bool
+   */
+  private static function isBundleEnabled(ContainerBuilder $container, string $name): bool
+  {
+    $bundles = $container->hasParameter('kernel.bundles') ? $container->getParameter('kernel.bundles') : [];
+
+    return \is_array($bundles) && isset($bundles[$name]);
   }
 
   /**

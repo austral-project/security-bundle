@@ -51,41 +51,26 @@ class UserEntityManager extends EntityManager implements UserEntityManagerInterf
     return $user;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function retrieveByEmail(string $email): ?UserInterface
   {
     return $this->userRepository()->retrieveByEmail($email);
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function retrieveByLogin(string $login): ?UserInterface
   {
     return $this->userRepository()->retrieveByLogin($login);
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function retrieveUserById(string $id): ?UserInterface
   {
     return $this->userRepository()->retrieveUserById($id);
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function retrieveByPasswordResetSelector(string $selector): ?UserInterface
   {
     return $this->userRepository()->retrieveByPasswordResetSelector($selector);
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function updateUser(UserInterface $user, bool $andFlush = true): self
   {
     $this->update($user, $andFlush);

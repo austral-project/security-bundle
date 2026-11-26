@@ -1,0 +1,41 @@
+{
+  "symbol-whitelist": [
+    "Austral\\AdminBundle\\Admin\\Admin",
+    "Austral\\AdminBundle\\DependencyInjection\\AdminModulesPrepender",
+    "Austral\\AdminBundle\\Event\\AdminEvents",
+    "Austral\\AdminBundle\\Event\\FilterAdminEvent",
+    "Austral\\AdminBundle\\Event\\FormAdminEvent",
+    "Austral\\AdminBundle\\Event\\ListAdminEvent",
+    "Austral\\AdminBundle\\Event\\ObjectAdminEvent",
+    "Austral\\AdminBundle\\Event\\QueryAdminEvent",
+    "Austral\\AdminBundle\\Page\\EntityQuery",
+    "Austral\\AdminBundle\\Security\\RoleTree",
+    "Austral\\FilterBundle\\Filter\\BooleanFilter",
+    "Austral\\FilterBundle\\Filter\\SearchFilter",
+    "Austral\\FormBundle\\Field\\EntityField",
+    "Austral\\FormBundle\\Field\\PasswordField",
+    "Austral\\FormBundle\\Field\\SelectField",
+    "Austral\\FormBundle\\Field\\SwitchField",
+    "Austral\\FormBundle\\Field\\TextField",
+    "Austral\\ListBundle\\Column\\ChoicesColumn",
+    "Austral\\ListBundle\\Column\\SwitchColumn",
+    "Austral\\ListBundle\\Column\\ValueColumn",
+    "Symfony\\Component\\String\\Slugger\\AsciiSlugger",
+    "Symfony\\Component\\Validator\\Constraints\\NotBlank",
+    "Symfony\\Component\\Validator\\Constraints\\Regex"
+  ],
+  "php-core-extensions": [
+    "Core",
+    "date",
+    "json",
+    "hash",
+    "pcre",
+    "Phar",
+    "Reflection",
+    "SPL",
+    "random",
+    "standard",
+    "mbstring"
+  ],
+  "scan-files": []
+}

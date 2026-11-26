@@ -64,3 +64,19 @@ fields:
       master:
         first:                                Password
         second:                               Password verification
+
+# Bridge with admin-bundle (flat keys)
+'fields.keyname.entitled': Key
+'fields.enabled.entitled': Enabled
+'helpers.keyname': Generated from the name when empty.
+'errors.plainPassword.blank': The password is required.
+'errors.role.format': 'A role starts with "ROLE_" followed by capital letters, digits and "_".'
+'roles.list': Access
+'roles.create': Create
+'roles.edit': Edit
+'roles.duplicate': Duplicate
+'roles.delete': Delete
+'roles.truncate': Delete all
+'roles.toggle': Change from the list
+'roles.sort': Sort
+'roles.export': Export
